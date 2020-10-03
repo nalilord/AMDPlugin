@@ -15,7 +15,7 @@ type
   ADL_ADAPTER_ACTIVE_GET = function(iNum: Integer; var iActive: Integer): Integer; stdcall;
   ADL_ADAPTER_VIDEOBIOSINFO_GET = function(iNum: Integer; var lpBiosInfo: TADLBiosInfo): Integer; stdcall;
   ADL_ADAPTER_ID_GET = function(iNum: Integer; var lpId: Integer): Integer; stdcall;
-  ADL_ADAPTER_MEMORYINFO_GET = function(iNum: Integer; var lpMemoryInfo: TADLMemoryInfo): Integer; stdcall;
+  ADL_ADAPTER_MEMORYINFO_GET = function(iNum: Integer; var lpMemoryInfo: TADLMemoryInfo): Integer; stdcall;
 
   ADL_OVERDRIVE_CAPS = function(iAdapterIndex: Integer; var iSupported: Integer; var iEnabled: Integer; var iVersion: Integer): Integer; stdcall;
 
@@ -126,7 +126,7 @@ type
     FOverdrive5_FanSpeedInfo: ADL_OVERDRIVE5_FANSPEEDINFO_GET;
     FOverdrive5_CurrentActivity: ADL_OVERDRIVE5_CURRENTACTIVITY_GET;
     FOverdrive5_ODParameters: ADL_OVERDRIVE5_ODPARAMETERS_GET;
-	  FAdapterInfo: PAdapterInfo;
+    FAdapterInfo: PAdapterInfo;
     FNumberAdapters: Integer;
     function GetAdapterCount: Integer;
     function GetAdapters(Index: Integer): TADLAdapter;
