@@ -6,7 +6,10 @@ uses
   System.Classes,
   System.StrUtils,
   System.Generics.Collections,
-  adl in 'adl.pas';
+  adl in '..\Common\adl.pas',
+  adl_defines in '..\Common\adl_defines.pas',
+  adl_sdk in '..\Common\adl_sdk.pas',
+  adl_structures in '..\Common\adl_structures.pas';
 
 {$R *.res}
 

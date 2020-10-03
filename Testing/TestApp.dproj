@@ -1,21 +1,16 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
-        <ProjectGuid>{A4D8AE43-710D-4775-98A4-CA57A36429AE}</ProjectGuid>
+        <ProjectGuid>{801BB1D5-6ECE-4A1B-AA69-7DCA47388FAF}</ProjectGuid>
         <ProjectVersion>19.1</ProjectVersion>
-        <FrameworkType>None</FrameworkType>
+        <FrameworkType>VCL</FrameworkType>
+        <MainSource>TestApp.dpr</MainSource>
         <Base>True</Base>
-        <Config Condition="'$(Config)'==''">Release</Config>
+        <Config Condition="'$(Config)'==''">Debug</Config>
         <Platform Condition="'$(Platform)'==''">Win64</Platform>
         <TargetedPlatforms>3</TargetedPlatforms>
-        <AppType>Library</AppType>
-        <MainSource>AMDPlugin.dpr</MainSource>
+        <AppType>Application</AppType>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
-        <Base>true</Base>
-    </PropertyGroup>
-    <PropertyGroup Condition="('$(Platform)'=='OSX64' and '$(Base)'=='true') or '$(Base_OSX64)'!=''">
-        <Base_OSX64>true</Base_OSX64>
-        <CfgParent>Base</CfgParent>
         <Base>true</Base>
     </PropertyGroup>
     <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Base)'=='true') or '$(Base_Win32)'!=''">
@@ -50,12 +45,6 @@
         <CfgParent>Base</CfgParent>
         <Base>true</Base>
     </PropertyGroup>
-    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_2)'=='true') or '$(Cfg_2_Win32)'!=''">
-        <Cfg_2_Win32>true</Cfg_2_Win32>
-        <CfgParent>Cfg_2</CfgParent>
-        <Cfg_2>true</Cfg_2>
-        <Base>true</Base>
-    </PropertyGroup>
     <PropertyGroup Condition="('$(Platform)'=='Win64' and '$(Cfg_2)'=='true') or '$(Cfg_2_Win64)'!=''">
         <Cfg_2_Win64>true</Cfg_2_Win64>
         <CfgParent>Cfg_2</CfgParent>
@@ -63,39 +52,40 @@
         <Base>true</Base>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base)'!=''">
-        <DCC_DcuOutput>.\$(Platform)\$(Config)</DCC_DcuOutput>
-        <DCC_ExeOutput>.\$(Platform)\$(Config)</DCC_ExeOutput>
+        <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;$(DCC_Namespace)</DCC_Namespace>
+        <SanitizedProjectName>TestApp</SanitizedProjectName>
+        <Icon_MainIcon>$(BDS)\bin\delphi_PROJECTICON.ico</Icon_MainIcon>
+        <DCC_DcuOutput>..\Build\$(Platform)\$(Config)</DCC_DcuOutput>
+        <DCC_ExeOutput>..\Build\$(Platform)\$(Config)</DCC_ExeOutput>
         <DCC_E>false</DCC_E>
         <DCC_N>false</DCC_N>
         <DCC_S>false</DCC_S>
         <DCC_F>false</DCC_F>
         <DCC_K>false</DCC_K>
-        <GenDll>true</GenDll>
-        <SanitizedProjectName>AMDPlugin</SanitizedProjectName>
         <VerInfo_Locale>1033</VerInfo_Locale>
-        <VerInfo_Keys>FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=AMDPlugin;LegalCopyright=(c) 2020 by NaliLord;OriginalFilename=AMDPlugin.dll;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=Rainmeter AMD GPU Plugin</VerInfo_Keys>
-        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
-        <VerInfo_DLL>true</VerInfo_DLL>
-        <VerInfo_AutoIncVersion>true</VerInfo_AutoIncVersion>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(Base_OSX64)'!=''">
-        <DCC_UsePackage>DBXSqliteDriver;RESTComponents;DBXInterBaseDriver;tethering;bindcompfmx;inetdb;fmx;FireDACIBDriver;fmxdae;dbexpress;IndyCore;dsnap;FireDACCommon;RESTBackendComponents;soapserver;bindengine;DBXMySQLDriver;CloudService;FireDACMySQLDriver;FireDACCommonODBC;FireDACCommonDriver;inet;IndyIPCommon;bindcompdbx;IndyIPServer;IndySystem;fmxFireDAC;FireDAC;FireDACSqliteDriver;FireDACPgDriver;soaprtl;DbxCommonDriver;xmlrtl;soapmidas;fmxobj;rtl;DbxClientDriver;CustomIPTransport;bindcomp;IndyIPClient;dbxcds;dsnapxml;dbrtl;IndyProtocols;inetdbxpress;fmxase;$(DCC_UsePackage)</DCC_UsePackage>
+        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win32)'!=''">
-        <DCC_UsePackage>DBXSqliteDriver;RESTComponents;dxSpreadSheetCoreConditionalFormattingDialogsRS27;QuishSkinRS27;DBXInterBaseDriver;dxSpreadSheetConditionalFormattingDialogsRS27;vclactnband;dxGaugeControlRS27;vclFireDAC;dxSpreadSheetReportDesignerRS27;dxSpreadSheetRS27;bindcompvclsmp;cxPivotGridOLAPRS27;tethering;svnui;dxPSRichEditControlLnkRS27;JvGlobus;FireDACADSDriver;dxBarDBNavRS27;cxLibraryRS27;JvPluginSystem;dxRibbonCustomizationFormRS27;JvMM;cxPivotGridRS27;dxADOServerModeRS27;vcltouch;JvBands;vcldb;bindcompfmx;svn;dxPScxExtCommonRS27;JvJans;JvNet;inetdb;FMX.dxMemDataRS27;JvAppFrm;dxFlowChartDesignerRS27;cxTreeListRS27;dxPScxSchedulerLnkRS27;JvDotNetCtrls;fmx;FireDACIBDriver;fmxdae;vcledge;JvWizards;dxRichEditDocumentModelRS27;dxPsPrVwAdvRS27;dbexpress;IndyCore;dxRibbonRS27;dxOrgChartAdvancedCustomizeFormRS27;vclx;dxPSdxFCLnkRS27;JvPageComps;dsnap;dxSpellCheckerRS27;FireDACCommon;JvDB;dxTileControlRS27;dxPDFViewerRS27;RESTBackendComponents;FMX.dxGridRS27;dxBarExtItemsRS27;cxSchedulerRS27;cxGridEMFRS27;VCLRESTComponents;soapserver;FMX.dxControlsRS27;dxWizardControlRS27;cxSchedulerTreeBrowserRS27;dxRichEditControlRS27;JclDeveloperTools;dxPScxTLLnkRS27;vclie;bindengine;DBXMySQLDriver;CloudService;dxBarExtDBItemsRS27;FireDACMySQLDriver;dxPSCoreRS27;dxFlowChartLayoutsRS27;dxADOEMFRS27;cxExportRS27;JvCmp;FireDACCommonODBC;FireDACCommonDriver;JvHMI;dxPScxPivotGridLnkRS27;inet;cxSchedulerWebServiceStorageRS27;cxPivotGridChartRS27;IndyIPCommon;bindcompdbx;dxPSdxOCLnkRS27;JvCustom;vcl;IndyIPServer;dxPScxPCProdRS27;JvXPCtrls;IndySystem;dxHttpIndyRequestRS27;dxFlowChartRS27;dxMapControlRS27;dsnapcon;dxComnRS27;dxPSdxDBOCLnkRS27;dxPSdxGaugeControlLnkRS27;FireDACMSAccDriver;fmxFireDAC;dxmdsRS27;vclimg;dxEMFRS27;dxPSdxPDFViewerLnkRS27;FireDAC;cxTreeListdxBarPopupMenuRS27;FMX.dxLayoutControlRS27;dxCoreRS27;dxPScxVGridLnkRS27;dxPSdxSpreadSheetLnkRS27;dxPSPrVwRibbonRS27;Jcl;JvCore;FireDACSqliteDriver;FireDACPgDriver;JvCrypt;cxSchedulerRibbonStyleEventEditorRS27;soaprtl;DbxCommonDriver;dxTabbedMDIRS27;dxRichEditCoreRS27;JvDlgs;JvManagedThreads;dxCloudServiceLibraryRS27;JvRuntimeDesign;xmlrtl;soapmidas;JvTimeFramework;fmxobj;vclwinx;dxPScxCommonRS27;rtl;dxdborRS27;DbxClientDriver;dxdbtrRS27;CustomIPTransport;vcldsnap;JvSystem;dxSkinsCoreRS27;dxPScxGridLnkRS27;JvStdCtrls;bindcomp;appanalytics;dxSpreadSheetCoreRS27;dxRichEditControlCoreRS27;cxVerticalGridRS27;dxGDIPlusRS27;IndyIPClient;dxFireDACServerModeRS27;dxFlowChartAdvancedCustomizeFormRS27;bindcompvcl;dxDockingRS27;dxServerModeRS27;dxNavBarRS27;cxSchedulerGridRS27;dxPSLnksRS27;dxorgcRS27;JvDocking;dbxcds;VclSmp;JvPascalInterpreter;adortl;dxDBXServerModeRS27;JclVcl;cxGridRS27;dsnapxml;dbrtl;IndyProtocols;inetdbxpress;dxBarRS27;dxPSdxLCLnkRS27;dxFireDACEMFRS27;dxPSdxMapControlLnkRS27;JclContainers;JvControls;JvPrintPreview;dxtrmdRS27;dxPSdxDBTVLnkRS27;fmxase;$(DCC_UsePackage)</DCC_UsePackage>
+        <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
         <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
-        <BT_BuildType>Debug</BT_BuildType>
-        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
-        <VerInfo_Keys>FileDescription=$(MSBuildProjectName) $(Platform) $(Config);FileVersion=1.0.0.5;InternalName=$(MSBuildProjectName);LegalCopyright=(c) 2020 by NaliLord;OriginalFilename=AMDPlugin.dll;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=Rainmeter AMD GPU Plugin;ProductVersion=1.0.0.0</VerInfo_Keys>
+        <DCC_UsePackage>FireDACSqliteDriver;FireDACDSDriver;DBXSqliteDriver;FireDACPgDriver;fmx;IndySystem;TeeDB;tethering;inetdbbde;vclib;DBXInterBaseDriver;DataSnapClient;DataSnapServer;DataSnapCommon;DataSnapProviderClient;DBXSybaseASEDriver;DbxCommonDriver;vclimg;dbxcds;DatasnapConnectorsFreePascal;MetropolisUILiveTile;vcldb;vcldsnap;fmxFireDAC;DBXDb2Driver;DBXOracleDriver;CustomIPTransport;vclribbon;dsnap;IndyIPServer;fmxase;vcl;IndyCore;DBXMSSQLDriver;IndyIPCommon;CloudService;FmxTeeUI;FireDACIBDriver;CodeSiteExpressPkg;DataSnapFireDAC;FireDACDBXDriver;soapserver;inetdbxpress;dsnapxml;FireDACInfxDriver;FireDACDb2Driver;adortl;FireDACASADriver;bindcompfmx;vcldbx;FireDACODBCDriver;RESTBackendComponents;rtl;dbrtl;DbxClientDriver;FireDACCommon;bindcomp;inetdb;Tee;DBXOdbcDriver;vclFireDAC;xmlrtl;DataSnapNativeClient;svnui;ibxpress;IndyProtocols;DBXMySQLDriver;FireDACCommonDriver;bindcompdbx;bindengine;vclactnband;soaprtl;FMXTee;TeeUI;bindcompvcl;vclie;FireDACADSDriver;vcltouch;VclSmp;FireDACMSSQLDriver;FireDAC;DBXInformixDriver;Intraweb;VCLRESTComponents;DataSnapConnectors;DataSnapServerMidas;dsnapcon;DBXFirebirdDriver;inet;fmxobj;FireDACMySQLDriver;soapmidas;vclx;svn;DBXSybaseASADriver;FireDACOracleDriver;fmxdae;RESTComponents;bdertl;FireDACMSAccDriver;dbexpress;DataSnapIndy10ServerTransport;IndyIPClient;$(DCC_UsePackage)</DCC_UsePackage>
         <VerInfo_Locale>1033</VerInfo_Locale>
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+        <VerInfo_Keys>CompanyName=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
+        <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
+        <UWP_DelphiLogo44>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_44.png</UWP_DelphiLogo44>
+        <UWP_DelphiLogo150>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_150.png</UWP_DelphiLogo150>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win64)'!=''">
-        <DCC_UsePackage>DBXSqliteDriver;RESTComponents;dxSpreadSheetCoreConditionalFormattingDialogsRS27;DBXInterBaseDriver;dxSpreadSheetConditionalFormattingDialogsRS27;vclactnband;dxGaugeControlRS27;vclFireDAC;dxSpreadSheetReportDesignerRS27;dxSpreadSheetRS27;bindcompvclsmp;cxPivotGridOLAPRS27;tethering;dxPSRichEditControlLnkRS27;FireDACADSDriver;dxBarDBNavRS27;cxLibraryRS27;dxRibbonCustomizationFormRS27;cxPivotGridRS27;dxADOServerModeRS27;vcltouch;vcldb;bindcompfmx;dxPScxExtCommonRS27;inetdb;FMX.dxMemDataRS27;dxFlowChartDesignerRS27;cxTreeListRS27;dxPScxSchedulerLnkRS27;fmx;FireDACIBDriver;fmxdae;vcledge;dxRichEditDocumentModelRS27;dxPsPrVwAdvRS27;dbexpress;IndyCore;dxRibbonRS27;dxOrgChartAdvancedCustomizeFormRS27;vclx;dxPSdxFCLnkRS27;dsnap;dxSpellCheckerRS27;FireDACCommon;dxTileControlRS27;dxPDFViewerRS27;RESTBackendComponents;FMX.dxGridRS27;dxBarExtItemsRS27;cxSchedulerRS27;cxGridEMFRS27;VCLRESTComponents;soapserver;FMX.dxControlsRS27;dxWizardControlRS27;cxSchedulerTreeBrowserRS27;dxRichEditControlRS27;dxPScxTLLnkRS27;vclie;bindengine;DBXMySQLDriver;CloudService;dxBarExtDBItemsRS27;FireDACMySQLDriver;dxPSCoreRS27;dxFlowChartLayoutsRS27;dxADOEMFRS27;cxExportRS27;FireDACCommonODBC;FireDACCommonDriver;dxPScxPivotGridLnkRS27;inet;cxSchedulerWebServiceStorageRS27;cxPivotGridChartRS27;IndyIPCommon;bindcompdbx;dxPSdxOCLnkRS27;vcl;IndyIPServer;dxPScxPCProdRS27;IndySystem;dxHttpIndyRequestRS27;dxFlowChartRS27;dxMapControlRS27;dsnapcon;dxComnRS27;dxPSdxDBOCLnkRS27;dxPSdxGaugeControlLnkRS27;FireDACMSAccDriver;fmxFireDAC;dxmdsRS27;vclimg;dxEMFRS27;dxPSdxPDFViewerLnkRS27;FireDAC;cxTreeListdxBarPopupMenuRS27;FMX.dxLayoutControlRS27;dxCoreRS27;dxPScxVGridLnkRS27;dxPSdxSpreadSheetLnkRS27;dxPSPrVwRibbonRS27;FireDACSqliteDriver;FireDACPgDriver;cxSchedulerRibbonStyleEventEditorRS27;soaprtl;DbxCommonDriver;dxTabbedMDIRS27;dxRichEditCoreRS27;dxCloudServiceLibraryRS27;xmlrtl;soapmidas;fmxobj;vclwinx;dxPScxCommonRS27;rtl;dxdborRS27;DbxClientDriver;dxdbtrRS27;CustomIPTransport;vcldsnap;dxSkinsCoreRS27;dxPScxGridLnkRS27;bindcomp;appanalytics;dxSpreadSheetCoreRS27;dxRichEditControlCoreRS27;cxVerticalGridRS27;dxGDIPlusRS27;IndyIPClient;dxFireDACServerModeRS27;dxFlowChartAdvancedCustomizeFormRS27;bindcompvcl;dxDockingRS27;dxServerModeRS27;dxNavBarRS27;cxSchedulerGridRS27;dxPSLnksRS27;dxorgcRS27;dbxcds;VclSmp;adortl;dxDBXServerModeRS27;cxGridRS27;dsnapxml;dbrtl;IndyProtocols;inetdbxpress;dxBarRS27;dxPSdxLCLnkRS27;dxFireDACEMFRS27;dxPSdxMapControlLnkRS27;dxtrmdRS27;dxPSdxDBTVLnkRS27;fmxase;$(DCC_UsePackage)</DCC_UsePackage>
+        <DCC_UsePackage>FireDACSqliteDriver;FireDACDSDriver;DBXSqliteDriver;FireDACPgDriver;fmx;IndySystem;TeeDB;tethering;vclib;DBXInterBaseDriver;DataSnapClient;DataSnapServer;DataSnapCommon;DataSnapProviderClient;DBXSybaseASEDriver;DbxCommonDriver;vclimg;dbxcds;DatasnapConnectorsFreePascal;MetropolisUILiveTile;vcldb;vcldsnap;fmxFireDAC;DBXDb2Driver;DBXOracleDriver;CustomIPTransport;vclribbon;dsnap;IndyIPServer;fmxase;vcl;IndyCore;DBXMSSQLDriver;IndyIPCommon;CloudService;FmxTeeUI;FireDACIBDriver;DataSnapFireDAC;FireDACDBXDriver;soapserver;inetdbxpress;dsnapxml;FireDACInfxDriver;FireDACDb2Driver;adortl;FireDACASADriver;bindcompfmx;FireDACODBCDriver;RESTBackendComponents;rtl;dbrtl;DbxClientDriver;FireDACCommon;bindcomp;inetdb;Tee;DBXOdbcDriver;vclFireDAC;xmlrtl;DataSnapNativeClient;ibxpress;IndyProtocols;DBXMySQLDriver;FireDACCommonDriver;bindcompdbx;bindengine;vclactnband;soaprtl;FMXTee;TeeUI;bindcompvcl;vclie;FireDACADSDriver;vcltouch;VclSmp;FireDACMSSQLDriver;FireDAC;DBXInformixDriver;Intraweb;VCLRESTComponents;DataSnapConnectors;DataSnapServerMidas;dsnapcon;DBXFirebirdDriver;inet;fmxobj;FireDACMySQLDriver;soapmidas;vclx;DBXSybaseASADriver;FireDACOracleDriver;fmxdae;RESTComponents;FireDACMSAccDriver;dbexpress;DataSnapIndy10ServerTransport;IndyIPClient;$(DCC_UsePackage)</DCC_UsePackage>
+        <UWP_DelphiLogo44>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_44.png</UWP_DelphiLogo44>
+        <UWP_DelphiLogo150>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_150.png</UWP_DelphiLogo150>
         <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;$(DCC_Namespace)</DCC_Namespace>
         <BT_BuildType>Debug</BT_BuildType>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
-        <VerInfo_Keys>FileDescription=$(MSBuildProjectName) $(Platform) $(Config);FileVersion=1.0.0.5;InternalName=$(MSBuildProjectName);LegalCopyright=(c) 2020 by NaliLord;OriginalFilename=AMDPlugin.dll;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=Rainmeter AMD GPU Plugin;ProductVersion=1.0.0.0</VerInfo_Keys>
+        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
         <VerInfo_Locale>1033</VerInfo_Locale>
+        <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1)'!=''">
         <DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
@@ -107,12 +97,13 @@
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
         <DCC_RemoteDebug>false</DCC_RemoteDebug>
+        <BT_BuildType>Debug</BT_BuildType>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win64)'!=''">
+        <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
+        <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_Locale>1033</VerInfo_Locale>
-        <Manifest_File>(None)</Manifest_File>
-        <Debugger_HostApplication>C:\Program Files\Rainmeter\Rainmeter.exe</Debugger_HostApplication>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2)'!=''">
         <DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
@@ -120,21 +111,22 @@
         <DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
         <DCC_DebugInformation>0</DCC_DebugInformation>
     </PropertyGroup>
-    <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
-        <VerInfo_Keys>FileDescription=$(MSBuildProjectName) $(Platform) $(Config);FileVersion=1.0.0.6;InternalName=$(MSBuildProjectName);LegalCopyright=(c) 2020 by NaliLord;OriginalFilename=AMDPlugin.dll;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=Rainmeter AMD GPU Plugin;ProductVersion=1.0.0.0</VerInfo_Keys>
-        <Manifest_File>(None)</Manifest_File>
-        <VerInfo_Build>6</VerInfo_Build>
-    </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win64)'!=''">
-        <Manifest_File>(None)</Manifest_File>
-        <VerInfo_Keys>FileDescription=$(MSBuildProjectName) $(Platform) $(Config);FileVersion=1.0.0.6;InternalName=$(MSBuildProjectName);LegalCopyright=(c) 2020 by NaliLord;OriginalFilename=AMDPlugin.dll;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=Rainmeter AMD GPU Plugin;ProductVersion=1.0.0.0</VerInfo_Keys>
-        <VerInfo_Build>6</VerInfo_Build>
+        <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
+        <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
     </PropertyGroup>
     <ItemGroup>
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
-        <DCCReference Include="adl.pas"/>
+        <DCCReference Include="Main.pas">
+            <Form>frmMain</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="..\Common\adl.pas"/>
+        <DCCReference Include="..\Common\adl_defines.pas"/>
+        <DCCReference Include="..\Common\adl_sdk.pas"/>
+        <DCCReference Include="..\Common\adl_structures.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
@@ -149,11 +141,11 @@
     </ItemGroup>
     <ProjectExtensions>
         <Borland.Personality>Delphi.Personality.12</Borland.Personality>
-        <Borland.ProjectType>Application</Borland.ProjectType>
+        <Borland.ProjectType/>
         <BorlandProject>
             <Delphi.Personality>
                 <Source>
-                    <Source Name="MainSource">AMDPlugin.dpr</Source>
+                    <Source Name="MainSource">TestApp.dpr</Source>
                 </Source>
                 <Excluded_Packages>
                     <Excluded_Packages Name="$(BDSBIN)\bcboffice2k270.bpl">Embarcadero C++Builder Office 2000 Servers Package</Excluded_Packages>
@@ -163,30 +155,15 @@
                 </Excluded_Packages>
             </Delphi.Personality>
             <Deployment Version="3">
-                <DeployFile LocalName="$(BDS)\Redist\osx32\libcgunwind.1.0.dylib" Class="DependencyModule">
-                    <Platform Name="OSX32">
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\Redist\iossimulator\libcgunwind.1.0.dylib" Class="DependencyModule">
-                    <Platform Name="iOSSimulator">
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\Redist\iossimulator\libpcre.dylib" Class="DependencyModule">
-                    <Platform Name="iOSSimulator">
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="Win32\Debug\AMDPlugin.dll" Configuration="Debug" Class="ProjectOutput">
-                    <Platform Name="Win32">
-                        <RemoteName>AMDPlugin.dll</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="Win64\Debug\AMDPlugin.dll" Configuration="Debug" Class="ProjectOutput">
+                <DeployFile LocalName="Win64\Debug\TestApp.exe" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win64">
-                        <RemoteName>AMDPlugin.dll</RemoteName>
+                        <RemoteName>TestApp.exe</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="Win64\Debug\TestApp.rsm" Configuration="Debug" Class="DebugSymbols">
+                    <Platform Name="Win64">
+                        <RemoteName>TestApp.rsm</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
@@ -952,7 +929,6 @@
                 <ProjectRoot Platform="Android64" Name="$(PROJECTNAME)"/>
             </Deployment>
             <Platforms>
-                <Platform value="OSX64">False</Platform>
                 <Platform value="Win32">True</Platform>
                 <Platform value="Win64">True</Platform>
             </Platforms>

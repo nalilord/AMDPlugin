@@ -3,10 +3,10 @@ program TestApp;
 uses
   Vcl.Forms,
   Main in 'Main.pas' {frmMain},
-  adl_defines in 'adl_defines.pas',
-  adl_sdk in 'adl_sdk.pas',
-  adl_structures in 'adl_structures.pas',
-  adl in 'adl.pas';
+  adl in '..\Common\adl.pas',
+  adl_defines in '..\Common\adl_defines.pas',
+  adl_sdk in '..\Common\adl_sdk.pas',
+  adl_structures in '..\Common\adl_structures.pas';
 
 {$R *.res}
 
