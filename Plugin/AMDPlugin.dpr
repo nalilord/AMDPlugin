@@ -1,3 +1,18 @@
+{*******************************************************}
+{                                                       }
+{       AMDPlugin - Rainmeter AMD GPU Plugin            }
+{                                                       }
+{       Version 0.2                                     }
+{                                                       }
+{       2020-10-05 - 0.2                                }
+{         Added "MemoryUsage" Measure                   }
+{       2020-10-03 - 0.1                                }
+{         Initial Release                               }
+{                                                       }
+{       (c) 2020 by NaliLord                            }
+{                                                       }
+{*******************************************************}
+
 library AMDPlugin;
 
 uses

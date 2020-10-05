@@ -1,10 +1,22 @@
+{*******************************************************}
+{                                                       }
+{       TD3DKMTStatistics Class for D3DKMT              }
+{                                                       }
+{       Version 0.1                                     }
+{                                                       }
+{       2020-10-05 - 0.1                                }
+{         Initial Release                               }
+{                                                       }
+{       (c) 2020 by NaliLord                            }
+{                                                       }
+{*******************************************************}
+
 unit d3dkmt;
 
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, System.Win.Registry, System.IniFiles, System.Generics.Defaults,
-  System.Generics.Collections, System.Contnrs, System.SyncObjs, d3dkmthk;
+  Winapi.Windows, System.SysUtils, d3dkmthk;
 
 type
   TD3DKMTStatistics = class
@@ -39,7 +51,9 @@ end;
 
 destructor TD3DKMTStatistics.Destroy;
 begin
+  Finalize;
 
+  inherited Destroy;
 end;
 
 procedure TD3DKMTStatistics.Finalize;
