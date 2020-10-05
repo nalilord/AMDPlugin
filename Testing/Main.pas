@@ -4,7 +4,7 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls, adl, Vcl.ComCtrls;
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.ComCtrls, adl, d3dkmt;
 
 type
   TfrmMain = class(TForm)
@@ -22,6 +22,8 @@ type
     edMemory: TEdit;
     tmrUpdate: TTimer;
     TrackBar1: TTrackBar;
+    Label4: TLabel;
+    edVRAM: TEdit;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure tmrUpdateTimer(Sender: TObject);
@@ -29,6 +31,7 @@ type
     procedure Button1Click(Sender: TObject);
   private
     FADL: TADL;
+    FD3DKMT: TD3DKMTStatistics;
   public
     { Public declarations }
   end;
@@ -54,6 +57,8 @@ end;
 procedure TfrmMain.FormCreate(Sender: TObject);
 begin
   FADL:=TADL.Create;
+  FADL.Update;
+  FD3DKMT:=TD3DKMTStatistics.Create(FADL.Adapters[0].PNP);
 end;
 
 procedure TfrmMain.FormDestroy(Sender: TObject);
@@ -64,12 +69,14 @@ end;
 procedure TfrmMain.tmrUpdateTimer(Sender: TObject);
 begin
   FADL.Update;
+  FD3DKMT.Update;
 
   edTemp.Text:=IntToStr(FADL.Adapters[0].Temp);
   edFan.Text:=IntToStr(FADL.Adapters[0].FanRPM);
   edLoad.Text:=IntToStr(FADL.Adapters[0].Activity);
   edClock.Text:=IntToStr(FADL.Adapters[0].Clock);
   edMemory.Text:=IntToStr(FADL.Adapters[0].Memory);
+  edVRAM.Text:=IntToStr(Round(FD3DKMT.UsedMemory / 1024 / 1024)) + '/' + IntToStr(Round(FADL.Adapters[0].MemorySize / 1024 / 1024));
 end;
 
 end.

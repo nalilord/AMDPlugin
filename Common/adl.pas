@@ -16,6 +16,7 @@ type
   ADL_ADAPTER_VIDEOBIOSINFO_GET = function(iNum: Integer; var lpBiosInfo: TADLBiosInfo): Integer; stdcall;
   ADL_ADAPTER_ID_GET = function(iNum: Integer; var lpId: Integer): Integer; stdcall;
   ADL_ADAPTER_MEMORYINFO_GET = function(iNum: Integer; var lpMemoryInfo: TADLMemoryInfo): Integer; stdcall;
+  ADL_ADAPTER_CONFIGMEMORY_GET = function(iAdapterIndex: Integer; iScreenWidth, iScreenHeight, displayFeatureMask, numDisplays: Integer; var displayFeatureList: TADLMemoryDisplayFeatures; var iNumMemTypes: Integer; var lppMemRequired: LPADLMemoryRequired): Integer; stdcall;
 
   ADL_OVERDRIVE_CAPS = function(iAdapterIndex: Integer; var iSupported: Integer; var iEnabled: Integer; var iVersion: Integer): Integer; stdcall;
 
@@ -50,6 +51,7 @@ type
   TADLAdapter = class
   private
     FUpdate: Boolean;
+    FPNP: String;
     FIndex: Integer;
     FBiosPartNumber: String;
     FBiosVersion: String;
@@ -79,6 +81,7 @@ type
     FBusLanesMax: Integer;
   public
     function IsLocation(ABusNumber, ADeviceNumber, AFunctionNumber: Integer): Boolean;
+    property PNP: String read FPNP;
     property BiosPartNumber: String read FBiosPartNumber;
     property BiosVersion: String read FBiosVersion;
     property BiosDate: String read FBiosDate;
@@ -293,6 +296,7 @@ begin
             Adapter.FMemoryBandwidth:=MemoryInfo.iMemoryBandwidth;
             Adapter.FIndex:=AdapterInfo.iAdapterIndex;
             Adapter.FName:=String(AnsiString(AdapterInfo.strAdapterName));
+            Adapter.FPNP:=String(AnsiString(AdapterInfo.strPNPString));
             Adapter.FDisplay:=String(AnsiString(AdapterInfo.strDisplayName));
             Adapter.FBusNumber:=AdapterInfo.iBusNumber;
             Adapter.FDeviceNumber:=AdapterInfo.iDeviceNumber;

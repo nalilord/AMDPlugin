@@ -4,7 +4,7 @@ object frmMain: TfrmMain
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSingle
   Caption = 'AMD GPU Info'
-  ClientHeight = 190
+  ClientHeight = 216
   ClientWidth = 185
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -63,9 +63,18 @@ object frmMain: TfrmMain
     Caption = 'Memory:'
     Layout = tlCenter
   end
-  object btnGetInfo: TButton
+  object Label4: TLabel
     Left = 8
     Top = 128
+    Width = 30
+    Height = 21
+    AutoSize = False
+    Caption = 'VRAM:'
+    Layout = tlCenter
+  end
+  object btnGetInfo: TButton
+    Left = 8
+    Top = 155
     Width = 80
     Height = 25
     Caption = 'Start'
@@ -98,7 +107,7 @@ object frmMain: TfrmMain
   end
   object Button1: TButton
     Left = 97
-    Top = 128
+    Top = 155
     Width = 80
     Height = 25
     Caption = 'Stop'
@@ -123,15 +132,24 @@ object frmMain: TfrmMain
   end
   object TrackBar1: TTrackBar
     Left = 0
-    Top = 159
+    Top = 185
     Width = 185
-    Height = 45
+    Height = 31
+    Align = alBottom
     Max = 1000
     Min = 250
     Position = 1000
     TabOrder = 7
     TickMarks = tmBoth
     TickStyle = tsNone
+  end
+  object edVRAM: TEdit
+    Left = 56
+    Top = 128
+    Width = 121
+    Height = 21
+    TabOrder = 8
+    Text = 'n/a'
   end
   object tmrUpdate: TTimer
     Enabled = False

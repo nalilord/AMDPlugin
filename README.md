@@ -15,6 +15,7 @@ Rainmeter AMD GPU Plugin
 * FanSpeedPercent
 * MemoryType
 * MemorySize
+* MemoryUsage
 * MemoryBandwidth
 * AdapterName
 * FanSpeedPercentMin
