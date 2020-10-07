@@ -16,7 +16,7 @@ unit d3dkmt;
 interface
 
 uses
-  Winapi.Windows, System.SysUtils, d3dkmthk;
+  Winapi.Windows, System.SysUtils, System.Classes, d3dkmthk;
 
 type
   TD3DKMTStatistics = class
@@ -24,8 +24,13 @@ type
     FDeviceName: String;
     FInitialized: Boolean;
     FOpenAdapter: D3DKMT_OPENADAPTERFROMDEVICENAME;
-    FUsedMemory: UInt64;
     FSegments: Cardinal;
+    FNodeCount: Cardinal;
+    FMemoryUsage: UInt64;
+    FSharedLimit: UInt64;
+    FDedicatedLimit: UInt64;
+    FSharedUsage: UInt64;
+    FDedicatedUsage: UInt64;
   protected
     procedure Initialize;
     procedure Finalize;
@@ -33,7 +38,11 @@ type
     constructor Create(ADevicePNP: String);
     destructor Destroy; override;
     procedure Update;
-    property UsedMemory: UInt64 read FUsedMemory;
+    property MemoryUsage: UInt64 read FMemoryUsage;
+    property SharedLimit: UInt64 read FSharedLimit;
+    property DedicatedLimit: UInt64 read FDedicatedLimit;
+    property SharedUsage: UInt64 read FSharedUsage;
+    property DedicatedUsage: UInt64 read FDedicatedUsage;
   end;
 
 implementation
@@ -76,14 +85,18 @@ begin
 
   ZeroMemory(@FOpenAdapter, SizeOf(FOpenAdapter));
   FOpenAdapter.pDeviceName:=PChar(FDeviceName);
+
   if Succeeded(D3DKMTOpenAdapterFromDeviceName(FOpenAdapter)) then
   begin
     ZeroMemory(@QueryStats, SizeOf(QueryStats));
     QueryStats.Typ:=D3DKMT_QUERYSTATISTICS_ADAPTER;
     QueryStats.AdapterLuid:=FOpenAdapter.AdapterLuid;
+
     if Succeeded(D3DKMTQueryStatistics(QueryStats)) then
-      FSegments:=QueryStats.QueryResult.AdapterInformation.NbSegments
-    else
+    begin
+      FSegments:=QueryStats.QueryResult.AdapterInformation.NbSegments;
+      FNodeCount:=QueryStats.QueryResult.AdapterInformation.NodeCount;
+    end else
       Finalize;
   end else
     Finalize;
@@ -93,8 +106,13 @@ procedure TD3DKMTStatistics.Update;
 var
   I: Integer;
   QueryStats: D3DKMT_QUERYSTATISTICS;
+  CommitLimit, BytesCommitted: UInt64;
 begin
-  FUsedMemory:=0;
+  FMemoryUsage:=0;
+  FSharedLimit:=0;
+  FDedicatedLimit:=0;
+  FSharedUsage:=0;
+  FDedicatedUsage:=0;
 
   if FInitialized then
   begin
@@ -104,8 +122,25 @@ begin
       QueryStats.Typ:=D3DKMT_QUERYSTATISTICS_SEGMENT;
       QueryStats.AdapterLuid:=FOpenAdapter.AdapterLuid;
       QueryStats.QuerySegment.SegmentId:=I;
+
       if Succeeded(D3DKMTQueryStatistics(QueryStats)) then
-        Inc(FUsedMemory, QueryStats.QueryResult.SegmentInformation.BytesResident);
+      begin
+        Inc(FMemoryUsage, QueryStats.QueryResult.SegmentInformation.BytesResident);
+
+        CommitLimit:=QueryStats.QueryResult.SegmentInformation.CommitLimit;
+        BytesCommitted:=QueryStats.QueryResult.SegmentInformation.BytesCommitted;
+        BytesCommitted:=QueryStats.QueryResult.SegmentInformation.BytesResident;
+
+        if QueryStats.QueryResult.SegmentInformation.Aperture <> 0 then
+        begin
+          Inc(FSharedLimit, CommitLimit);
+          Inc(FSharedUsage, BytesCommitted);
+        end else
+        begin
+          Inc(FDedicatedLimit, CommitLimit);
+          Inc(FDedicatedUsage, BytesCommitted);
+        end;
+      end;
     end;
   end;
 end;

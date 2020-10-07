@@ -18,7 +18,7 @@ unit adl;
 interface
 
 uses
-  Winapi.Windows, System.SysUtils, System.Generics.Collections, adl_structures, adl_defines, adl_sdk;
+  Winapi.Windows, System.SysUtils, System.Classes, System.Win.Registry, System.Generics.Collections, adl_structures, adl_defines, adl_sdk;
 
 type
   TADLAdapter = class
@@ -52,6 +52,8 @@ type
     FBusSpeed: Integer;
     FBusLanes: Integer;
     FBusLanesMax: Integer;
+    FDriverDate: String;
+    FDriverVersion: String;
   public
     function IsLocation(ABusNumber, ADeviceNumber, AFunctionNumber: Integer): Boolean;
     property PNP: String read FPNP;
@@ -81,6 +83,8 @@ type
     property BusSpeed: Integer read FBusSpeed;
     property BusLanes: Integer read FBusLanes;
     property BusLanesMax: Integer read FBusLanesMax;
+    property DriverDate: String read FDriverDate;
+    property DriverVersion: String read FDriverVersion;
   end;
 
   TADL = class
@@ -225,6 +229,7 @@ end;
 
 procedure TADL.Update;
 var
+  Registry: TRegistry;
   Adapter: TADLAdapter;
   I, AdapterActive, IsSupported, IsEnabled, Version: Integer;
   BiosInfo: TADLBiosInfo;
@@ -261,21 +266,39 @@ begin
             FAdapter_MemoryInfo(AdapterInfo.iAdapterIndex, MemoryInfo);
 
             Adapter:=TADLAdapter.Create;
-            Adapter.FBiosPartNumber:=String(AnsiString(BiosInfo.strPartNumber));
-            Adapter.FBiosVersion:=String(AnsiString(BiosInfo.strVersion));
-            Adapter.FBiosDate:=String(AnsiString(BiosInfo.strDate));
-            Adapter.FMemorySize:=MemoryInfo.iMemorySize;
-            Adapter.FMemoryType:=String(AnsiString(MemoryInfo.strMemoryType));
-            Adapter.FMemoryBandwidth:=MemoryInfo.iMemoryBandwidth;
-            Adapter.FIndex:=AdapterInfo.iAdapterIndex;
-            Adapter.FName:=String(AnsiString(AdapterInfo.strAdapterName));
-            Adapter.FPNP:=String(AnsiString(AdapterInfo.strPNPString));
-            Adapter.FDisplay:=String(AnsiString(AdapterInfo.strDisplayName));
-            Adapter.FBusNumber:=AdapterInfo.iBusNumber;
-            Adapter.FDeviceNumber:=AdapterInfo.iDeviceNumber;
-            Adapter.FFunctionNumber:=AdapterInfo.iFunctionNumber;
-            Adapter.FUpdate:=True;
-            FAdapters.Add(Adapter);
+            try
+              Adapter.FUpdate:=True;
+
+              Adapter.FBiosPartNumber:=String(AnsiString(BiosInfo.strPartNumber));
+              Adapter.FBiosVersion:=String(AnsiString(BiosInfo.strVersion));
+              Adapter.FBiosDate:=String(AnsiString(BiosInfo.strDate));
+              Adapter.FMemorySize:=MemoryInfo.iMemorySize;
+              Adapter.FMemoryType:=String(AnsiString(MemoryInfo.strMemoryType));
+              Adapter.FMemoryBandwidth:=MemoryInfo.iMemoryBandwidth;
+              Adapter.FIndex:=AdapterInfo.iAdapterIndex;
+              Adapter.FName:=String(AnsiString(AdapterInfo.strAdapterName));
+              Adapter.FPNP:=String(AnsiString(AdapterInfo.strPNPString));
+              Adapter.FDisplay:=String(AnsiString(AdapterInfo.strDisplayName));
+              Adapter.FBusNumber:=AdapterInfo.iBusNumber;
+              Adapter.FDeviceNumber:=AdapterInfo.iDeviceNumber;
+              Adapter.FFunctionNumber:=AdapterInfo.iFunctionNumber;
+
+              Registry:=TRegistry.Create(KEY_READ);
+              try
+                Registry.RootKey:=HKEY_LOCAL_MACHINE;
+                if Registry.OpenKey(StringReplace(String(AnsiString(PAnsiChar(@AdapterInfo.strDriverPath[0]))), '\Registry\Machine\', '', [rfIgnoreCase]), False) then
+                try
+                  Adapter.FDriverDate:=Registry.ReadString('DriverDate');
+                  Adapter.FDriverVersion:=Registry.ReadString('DriverVersion');
+                finally
+                  Registry.CloseKey;
+                end;
+              finally
+                FreeAndNil(Registry);
+              end;
+            finally
+              FAdapters.Add(Adapter);
+            end;
           end;
 
           if Assigned(Adapter) AND Adapter.FUpdate then

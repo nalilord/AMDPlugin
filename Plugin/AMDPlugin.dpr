@@ -2,8 +2,15 @@
 {                                                       }
 {       AMDPlugin - Rainmeter AMD GPU Plugin            }
 {                                                       }
-{       Version 0.2                                     }
+{       Version 0.3                                     }
 {                                                       }
+{       2020-10-07 - 0.3                                }
+{         Added "DriverDate" Measure                    }
+{         Added "DriverVersion" Measure                 }
+{         Added "SharedLimit" Measure                   }
+{         Added "SharedUsage" Measure                   }
+{         Added "DedicatedLimit" Measure                }
+{         Added "DedicatedUsage" Measure                }
 {       2020-10-05 - 0.2                                }
 {         Added "MemoryUsage" Measure                   }
 {       2020-10-03 - 0.1                                }
@@ -37,16 +44,16 @@ const
 type
   TMeasureID = (Unknown, Temperature, Clock, MemoryClock, Voltage, Activity, PerformanceLevel,
     PCIECurrentBusSpeed, PCIECurrentBusLanes, PCIEMaxBusLanes, FanSpeedRPM, FanSpeedPercent, MemoryType,
-    MemorySize, MemoryUsage, MemoryBandwidth, AdapterName, AdapterActive, FanSpeedPercentMin, FanSpeedPercentMax,
-    FanSpeedRPMMin, FanSpeedRPMMax, BiosDate, BiosVersion, BiosPartNumber, AdapterIdentifier, NumberOfAdapters,
-    NumberOfDisplays);
+    MemorySize, MemoryUsage, SharedLimit, DedicatedLimit, SharedUsage, DedicatedUsage, MemoryBandwidth, AdapterName,
+    AdapterActive, FanSpeedPercentMin, FanSpeedPercentMax, FanSpeedRPMMin, FanSpeedRPMMax, BiosDate, BiosVersion,
+    BiosPartNumber, AdapterIdentifier, NumberOfAdapters, NumberOfDisplays, DriverDate, DriverVersion);
 
 const
   MEASUREID_NAMES: Array[TMeasureID] of String = ('Unknown', 'Temperature', 'Clock', 'MemoryClock', 'Voltage', 'Activity', 'PerformanceLevel',
     'PCIECurrentBusSpeed', 'PCIECurrentBusLanes', 'PCIEMaxBusLanes', 'FanSpeedRPM', 'FanSpeedPercent', 'MemoryType',
-    'MemorySize', 'MemoryUsage', 'MemoryBandwidth', 'AdapterName', 'AdapterActive', 'FanSpeedPercentMin', 'FanSpeedPercentMax',
-    'FanSpeedRPMMin', 'FanSpeedRPMMax', 'BiosDate', 'BiosVersion', 'BiosPartNumber', 'AdapterIdentifier', 'NumberOfAdapters',
-    'NumberOfDisplays');
+    'MemorySize', 'MemoryUsage', 'SharedLimit', 'DedicatedLimit', 'SharedUsage', 'DedicatedUsage', 'MemoryBandwidth', 'AdapterName',
+    'AdapterActive', 'FanSpeedPercentMin', 'FanSpeedPercentMax', 'FanSpeedRPMMin', 'FanSpeedRPMMax', 'BiosDate', 'BiosVersion',
+    'BiosPartNumber', 'AdapterIdentifier', 'NumberOfAdapters', 'NumberOfDisplays', 'DriverDate', 'DriverVersion');
 
 type
   TMeasure = class
@@ -108,15 +115,17 @@ begin
   MeasureUpdate;
 
   Measure:=TMeasure.Create;
-  Measure.Name:=RmReadString(ARm, 'MeasureID', '', True);
-  Measure.ID:=TMeasureID(Max(0, IndexStr(Measure.Name, MEASUREID_NAMES)));
-  Measure.Adapter:=Trunc(RmReadFormula(ARm, 'AdapterID', 0));
+  try
+    Measure.Name:=RmReadString(ARm, 'MeasureID', '', True);
+    Measure.ID:=TMeasureID(Max(0, IndexStr(Measure.Name, MEASUREID_NAMES)));
+    Measure.Adapter:=Trunc(RmReadFormula(ARm, 'AdapterID', 0));
 
-  if Measure.ID = MemoryUsage then
-    if (Measure.Adapter >= 0) AND (Measure.Adapter < ADL.AdapterCount) then
-      Measure.D3DKMT:=TD3DKMTStatistics.Create(ADL.Adapters[Measure.Adapter].PNP);
-
-  List.Add(Measure);
+    if Measure.ID IN [MemoryUsage, SharedLimit, DedicatedLimit, SharedUsage, DedicatedUsage] then
+      if (Measure.Adapter >= 0) AND (Measure.Adapter < ADL.AdapterCount) then
+        Measure.D3DKMT:=TD3DKMTStatistics.Create(ADL.Adapters[Measure.Adapter].PNP);
+  finally
+    List.Add(Measure);
+  end;
 
   AData:=Measure;
 end;
@@ -141,7 +150,6 @@ begin
     if (Measure.Adapter >= 0) AND (Measure.Adapter < ADL.AdapterCount) then
     begin
       case Measure.ID of
-        Unknown             : ;
         Temperature         : Result:=ADL.Adapters[Measure.Adapter].Temp;
         Clock               : Result:=ADL.Adapters[Measure.Adapter].Clock;
         MemoryClock         : Result:=ADL.Adapters[Measure.Adapter].Memory;
@@ -153,22 +161,18 @@ begin
         PCIEMaxBusLanes     : Result:=ADL.Adapters[Measure.Adapter].BusLanesMax;
         FanSpeedRPM         : Result:=ADL.Adapters[Measure.Adapter].FanRPM;
         FanSpeedPercent     : Result:=ADL.Adapters[Measure.Adapter].Fan;
-        MemoryType          : ;
         MemorySize          : Result:=ADL.Adapters[Measure.Adapter].MemorySize;
-        MemoryUsage         : if Assigned(Measure.D3DKMT) then Result:=Measure.D3DKMT.UsedMemory;
+        MemoryUsage         : if Assigned(Measure.D3DKMT) then Result:=Measure.D3DKMT.MemoryUsage;
+        SharedLimit         : if Assigned(Measure.D3DKMT) then Result:=Measure.D3DKMT.SharedLimit;
+        DedicatedLimit      : if Assigned(Measure.D3DKMT) then Result:=Measure.D3DKMT.DedicatedLimit;
+        SharedUsage         : if Assigned(Measure.D3DKMT) then Result:=Measure.D3DKMT.SharedUsage;
+        DedicatedUsage      : if Assigned(Measure.D3DKMT) then Result:=Measure.D3DKMT.DedicatedUsage;
         MemoryBandwidth     : Result:=ADL.Adapters[Measure.Adapter].MemoryBandwidth;
-        AdapterName         : ;
-        AdapterActive       : ;
         FanSpeedPercentMin  : Result:=0;
         FanSpeedPercentMax  : Result:=100;
         FanSpeedRPMMin      : Result:=0;
         FanSpeedRPMMax      : Result:=ADL.Adapters[Measure.Adapter].FanMaxRPM;
-        BiosDate            : ;
-        BiosVersion         : ;
-        BiosPartNumber      : ;
-        AdapterIdentifier   : ;
         NumberOfAdapters    : Result:=ADL.AdapterCount;
-        NumberOfDisplays    : ;
       end;
     end;
   end;
@@ -189,50 +193,38 @@ begin
     if (Measure.Adapter >= 0) AND (Measure.Adapter < ADL.AdapterCount) then
     begin
       case Measure.ID of
-        Unknown             : ;
-        Temperature         : ;
-        Clock               : ;
-        MemoryClock         : ;
-        Voltage             : ;
-        Activity            : ;
-        PerformanceLevel    : ;
-        PCIECurrentBusSpeed : ;
-        PCIECurrentBusLanes : ;
-        PCIEMaxBusLanes     : ;
-        FanSpeedRPM         : ;
-        FanSpeedPercent     : ;
-        MemoryType          : Result:=PWideChar(ADL.Adapters[Measure.Adapter].MemoryType);
-        MemorySize          : ;
-        MemoryUsage         : ;
-        MemoryBandwidth     : ;
-        AdapterName         : Result:=PWideChar(ADL.Adapters[Measure.Adapter].Name);
-        AdapterActive       : ;
-        FanSpeedPercentMin  : ;
-        FanSpeedPercentMax  : ;
-        FanSpeedRPMMin      : ;
-        FanSpeedRPMMax      : ;
-        BiosDate            : Result:=PWideChar(ADL.Adapters[Measure.Adapter].BiosDate);
-        BiosVersion         : Result:=PWideChar(ADL.Adapters[Measure.Adapter].BiosVersion);
-        BiosPartNumber      : Result:=PWideChar(ADL.Adapters[Measure.Adapter].BiosPartNumber);
-        AdapterIdentifier   : ;
-        NumberOfAdapters    : ;
-        NumberOfDisplays    : ;
+        MemoryType     : Result:=PWideChar(ADL.Adapters[Measure.Adapter].MemoryType);
+        AdapterName    : Result:=PWideChar(ADL.Adapters[Measure.Adapter].Name);
+        BiosDate       : Result:=PWideChar(ADL.Adapters[Measure.Adapter].BiosDate);
+        BiosVersion    : Result:=PWideChar(ADL.Adapters[Measure.Adapter].BiosVersion);
+        BiosPartNumber : Result:=PWideChar(ADL.Adapters[Measure.Adapter].BiosPartNumber);
+        DriverDate     : Result:=PWideChar(ADL.Adapters[Measure.Adapter].DriverDate);
+        DriverVersion  : Result:=PWideChar(ADL.Adapters[Measure.Adapter].DriverVersion);
       end;
     end;
   end;
 end;
 
-procedure Finalize(AData: Pointer); stdcall;
+procedure Finalize(AData: Pointer); stdcall
+var
+  Measure: TMeasure;
 begin
-  if Assigned(List) then
+  if Assigned(AData) then
+  begin
+    Measure:=List.Extract(AData);
+    if Assigned(Measure) then
+      Measure.Free;
+  end;
+
+  if Assigned(List) AND (List.Count = 0) then
     FreeAndNil(List);
-  if Assigned(ADL) then
+  if Assigned(ADL) AND NOT Assigned(List) then
     FreeAndNil(ADL);
 end;
 
 function GetPluginVersion: Cardinal; stdcall;
 begin
-  Result:=2;
+  Result:=3;
 end;
 
 function GetPluginAuthor: PWideChar; stdcall;

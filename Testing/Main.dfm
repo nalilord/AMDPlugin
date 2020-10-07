@@ -4,7 +4,7 @@ object frmMain: TfrmMain
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSingle
   Caption = 'AMD GPU Info'
-  ClientHeight = 216
+  ClientHeight = 327
   ClientWidth = 185
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -74,7 +74,7 @@ object frmMain: TfrmMain
   end
   object btnGetInfo: TButton
     Left = 8
-    Top = 155
+    Top = 268
     Width = 80
     Height = 25
     Caption = 'Start'
@@ -106,8 +106,8 @@ object frmMain: TfrmMain
     Text = 'n/a'
   end
   object Button1: TButton
-    Left = 97
-    Top = 155
+    Left = 94
+    Top = 268
     Width = 80
     Height = 25
     Caption = 'Stop'
@@ -132,7 +132,7 @@ object frmMain: TfrmMain
   end
   object TrackBar1: TTrackBar
     Left = 0
-    Top = 185
+    Top = 296
     Width = 185
     Height = 31
     Align = alBottom
@@ -142,6 +142,7 @@ object frmMain: TfrmMain
     TabOrder = 7
     TickMarks = tmBoth
     TickStyle = tsNone
+    ExplicitTop = 185
   end
   object edVRAM: TEdit
     Left = 56
@@ -150,6 +151,56 @@ object frmMain: TfrmMain
     Height = 21
     TabOrder = 8
     Text = 'n/a'
+  end
+  object lblMemoryUsage: TStaticText
+    Left = 8
+    Top = 155
+    Width = 169
+    Height = 17
+    AutoSize = False
+    BorderStyle = sbsSunken
+    Caption = 'lblMemoryUsage'
+    TabOrder = 9
+  end
+  object lblSharedLimit: TStaticText
+    Left = 8
+    Top = 176
+    Width = 169
+    Height = 17
+    AutoSize = False
+    BorderStyle = sbsSunken
+    Caption = 'lblSharedLimit'
+    TabOrder = 10
+  end
+  object lblDedicatedLimit: TStaticText
+    Left = 8
+    Top = 199
+    Width = 169
+    Height = 17
+    AutoSize = False
+    BorderStyle = sbsSunken
+    Caption = 'lblDedicatedLimit'
+    TabOrder = 11
+  end
+  object lblSharedUsage: TStaticText
+    Left = 8
+    Top = 222
+    Width = 169
+    Height = 17
+    AutoSize = False
+    BorderStyle = sbsSunken
+    Caption = 'lblSharedUsage'
+    TabOrder = 12
+  end
+  object lblDedicatedUsage: TStaticText
+    Left = 8
+    Top = 245
+    Width = 169
+    Height = 17
+    AutoSize = False
+    BorderStyle = sbsSunken
+    Caption = 'lblDedicatedUsage'
+    TabOrder = 13
   end
   object tmrUpdate: TTimer
     Enabled = False
