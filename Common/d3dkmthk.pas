@@ -384,6 +384,12 @@ type
     hAdapter: ULONG;     // in: adapter handle
   end;
 
+  D3DKMT_SEGMENTSIZEINFO = record
+    DedicatedVideoMemorySize: ULONGLONG; // The size, in bytes, of memory that is dedicated from video memory.
+    DedicatedSystemMemorySize: ULONGLONG; // The size, in bytes, of memory that is dedicated from system memory.
+    SharedSystemMemorySize: ULONGLONG; // The size, in bytes, of memory from system memory that can be shared by many users.
+  end;
+
 function D3DKMTQueryAdapterInfo(var Adapter: D3DKMT_QUERYADAPTERINFO): HRESULT; stdcall; external 'gdi32.dll';
 function D3DKMTOpenAdapterFromHdc(var Adapter: D3DKMT_OPENADAPTERFROMHDC): HRESULT; stdcall; external 'gdi32.dll';
 function D3DKMTOpenAdapterFromGdiDisplayName(var Adapter: D3DKMT_OPENADAPTERFROMGDIDISPLAYNAME): HRESULT; stdcall; external 'gdi32.dll';

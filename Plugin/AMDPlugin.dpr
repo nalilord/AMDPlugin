@@ -107,6 +107,10 @@ procedure Initialize(var AData: Pointer; ARm: Pointer); stdcall;
 var
   Measure: TMeasure;
 begin
+//  AllocConsole;
+
+//  WriteLn('Initialize ->');
+
   if NOT Assigned(ADL) then
     ADL:=TADL.Create;
   if NOT Assigned(List) then
@@ -120,6 +124,9 @@ begin
     Measure.ID:=TMeasureID(Max(0, IndexStr(Measure.Name, MEASUREID_NAMES)));
     Measure.Adapter:=Trunc(RmReadFormula(ARm, 'AdapterID', 0));
 
+//    WriteLn('  Name=', Measure.Name);
+//    WriteLn('  Adapter=', Measure.Adapter);
+
     if Measure.ID IN [MemoryUsage, SharedLimit, DedicatedLimit, SharedUsage, DedicatedUsage] then
       if (Measure.Adapter >= 0) AND (Measure.Adapter < ADL.AdapterCount) then
         Measure.D3DKMT:=TD3DKMTStatistics.Create(ADL.Adapters[Measure.Adapter].PNP);
@@ -128,6 +135,7 @@ begin
   end;
 
   AData:=Measure;
+//  WriteLn('<- Initialize');
 end;
 
 procedure Reload(AData: Pointer; ARm: Pointer; var AMaxValue: Double); stdcall;
@@ -139,6 +147,7 @@ function Update(AData: Pointer): Double; stdcall;
 var
   Measure: TMeasure;
 begin
+//  WriteLn('Update ->');
   Result:=0.0;
 
   if Assigned(AData) then
@@ -147,8 +156,13 @@ begin
 
     MeasureUpdate(Measure);
 
+//    WriteLn('  Measure: 0x', IntToHex(NativeInt(Measure), SizeOf(NativeInt) * 2));
+
     if (Measure.Adapter >= 0) AND (Measure.Adapter < ADL.AdapterCount) then
     begin
+//      WriteLn(Format('  Name=%s'#13#10'  Adapter=%d'#13#10'  Count=%d', [Measure.Name, Measure.Adapter, ADL.AdapterCount]));
+//      WriteLn(Format('  D3DKMT=%s', [BoolToStr(Assigned(Measure.D3DKMT), True)]));
+
       case Measure.ID of
         Temperature         : Result:=ADL.Adapters[Measure.Adapter].Temp;
         Clock               : Result:=ADL.Adapters[Measure.Adapter].Clock;
@@ -176,12 +190,16 @@ begin
       end;
     end;
   end;
+
+//  WriteLn('  Value=', FormatFloat('0.00', Result));
+//  WriteLn('<- Update');
 end;
 
 function GetString(AData: Pointer): PWideChar; stdcall;
 var
   Measure: TMeasure;
 begin
+//  WriteLn('GetString ->');
   Result:=nil;
 
   if Assigned(AData) then
@@ -190,8 +208,13 @@ begin
 
     MeasureUpdate(Measure);
 
+//    WriteLn('  Measure: 0x', IntToHex(NativeInt(Measure), SizeOf(NativeInt) * 2));
+
     if (Measure.Adapter >= 0) AND (Measure.Adapter < ADL.AdapterCount) then
     begin
+//      WriteLn(Format('  Name=%s'#13#10'  Adapter=%d'#13#10'  Count=%d', [Measure.Name, Measure.Adapter, ADL.AdapterCount]));
+//      WriteLn(Format('  D3DKMT=%s', [BoolToStr(Assigned(Measure.D3DKMT), True)]));
+
       case Measure.ID of
         MemoryType     : Result:=PWideChar(ADL.Adapters[Measure.Adapter].MemoryType);
         AdapterName    : Result:=PWideChar(ADL.Adapters[Measure.Adapter].Name);
@@ -203,6 +226,13 @@ begin
       end;
     end;
   end;
+
+//  if Assigned(Result) then
+//    WriteLn('  Value=', Result)
+//  else
+//    WriteLn('  Value=<null>');
+
+//  WriteLn('<- GetString');
 end;
 
 procedure Finalize(AData: Pointer); stdcall

@@ -113,8 +113,8 @@
     <PropertyGroup Condition="'$(Cfg_1_Win64)'!=''">
         <Manifest_File>(None)</Manifest_File>
         <Debugger_HostApplication>C:\Program Files\Rainmeter\Rainmeter.exe</Debugger_HostApplication>
-        <VerInfo_Keys>FileDescription=$(MSBuildProjectName) $(Platform) $(Config);FileVersion=1.0.0.6;InternalName=$(MSBuildProjectName);LegalCopyright=(c) 2020 by NaliLord;OriginalFilename=AMDPlugin.dll;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=Rainmeter AMD GPU Plugin;ProductVersion=1.0.0.0</VerInfo_Keys>
-        <VerInfo_Build>6</VerInfo_Build>
+        <VerInfo_Keys>FileDescription=$(MSBuildProjectName) $(Platform) $(Config);FileVersion=1.0.0.8;InternalName=$(MSBuildProjectName);LegalCopyright=(c) 2020 by NaliLord;OriginalFilename=AMDPlugin.dll;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=Rainmeter AMD GPU Plugin;ProductVersion=1.0.0.0</VerInfo_Keys>
+        <VerInfo_Build>8</VerInfo_Build>
         <DCC_ExeOutput>$(APPDATA)\Rainmeter\Plugins</DCC_ExeOutput>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2)'!=''">
@@ -124,16 +124,16 @@
         <DCC_DebugInformation>0</DCC_DebugInformation>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
-        <VerInfo_Keys>FileDescription=$(MSBuildProjectName) $(Platform) $(Config);FileVersion=1.0.3.2;InternalName=$(MSBuildProjectName);LegalCopyright=(c) 2020 by NaliLord;OriginalFilename=AMDPlugin.dll;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=Rainmeter AMD GPU Plugin;ProductVersion=1.0.0.0</VerInfo_Keys>
+        <VerInfo_Keys>FileDescription=$(MSBuildProjectName) $(Platform) $(Config);FileVersion=1.0.4.1;InternalName=$(MSBuildProjectName);LegalCopyright=(c) 2020 by NaliLord;OriginalFilename=AMDPlugin.dll;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=Rainmeter AMD GPU Plugin;ProductVersion=1.0.0.0</VerInfo_Keys>
         <Manifest_File>(None)</Manifest_File>
-        <VerInfo_Build>2</VerInfo_Build>
-        <VerInfo_Release>3</VerInfo_Release>
+        <VerInfo_Release>4</VerInfo_Release>
+        <VerInfo_Build>1</VerInfo_Build>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win64)'!=''">
         <Manifest_File>(None)</Manifest_File>
-        <VerInfo_Keys>FileDescription=$(MSBuildProjectName) $(Platform) $(Config);FileVersion=1.0.3.2;InternalName=$(MSBuildProjectName);LegalCopyright=(c) 2020 by NaliLord;OriginalFilename=AMDPlugin.dll;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=Rainmeter AMD GPU Plugin;ProductVersion=1.0.0.0</VerInfo_Keys>
-        <VerInfo_Build>2</VerInfo_Build>
-        <VerInfo_Release>3</VerInfo_Release>
+        <VerInfo_Keys>FileDescription=$(MSBuildProjectName) $(Platform) $(Config);FileVersion=1.0.4.1;InternalName=$(MSBuildProjectName);LegalCopyright=(c) 2020 by NaliLord;OriginalFilename=AMDPlugin.dll;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=Rainmeter AMD GPU Plugin;ProductVersion=1.0.0.0</VerInfo_Keys>
+        <VerInfo_Release>4</VerInfo_Release>
+        <VerInfo_Build>1</VerInfo_Build>
     </PropertyGroup>
     <ItemGroup>
         <DelphiCompile Include="$(MainSource)">

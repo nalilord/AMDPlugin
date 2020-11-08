@@ -4,8 +4,8 @@ object frmMain: TfrmMain
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSingle
   Caption = 'AMD GPU Info'
-  ClientHeight = 327
-  ClientWidth = 185
+  ClientHeight = 215
+  ClientWidth = 456
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -74,7 +74,7 @@ object frmMain: TfrmMain
   end
   object btnGetInfo: TButton
     Left = 8
-    Top = 268
+    Top = 155
     Width = 80
     Height = 25
     Caption = 'Start'
@@ -107,7 +107,7 @@ object frmMain: TfrmMain
   end
   object Button1: TButton
     Left = 94
-    Top = 268
+    Top = 155
     Width = 80
     Height = 25
     Caption = 'Stop'
@@ -132,8 +132,8 @@ object frmMain: TfrmMain
   end
   object TrackBar1: TTrackBar
     Left = 0
-    Top = 296
-    Width = 185
+    Top = 184
+    Width = 456
     Height = 31
     Align = alBottom
     Max = 1000
@@ -142,7 +142,6 @@ object frmMain: TfrmMain
     TabOrder = 7
     TickMarks = tmBoth
     TickStyle = tsNone
-    ExplicitTop = 185
   end
   object edVRAM: TEdit
     Left = 56
@@ -152,55 +151,98 @@ object frmMain: TfrmMain
     TabOrder = 8
     Text = 'n/a'
   end
-  object lblMemoryUsage: TStaticText
-    Left = 8
-    Top = 155
-    Width = 169
-    Height = 17
-    AutoSize = False
-    BorderStyle = sbsSunken
-    Caption = 'lblMemoryUsage'
+  object GroupBox1: TGroupBox
+    Left = 183
+    Top = 8
+    Width = 265
+    Height = 141
+    Caption = ' TD3DKMT Memory Info '
     TabOrder = 9
-  end
-  object lblSharedLimit: TStaticText
-    Left = 8
-    Top = 176
-    Width = 169
-    Height = 17
-    AutoSize = False
-    BorderStyle = sbsSunken
-    Caption = 'lblSharedLimit'
-    TabOrder = 10
-  end
-  object lblDedicatedLimit: TStaticText
-    Left = 8
-    Top = 199
-    Width = 169
-    Height = 17
-    AutoSize = False
-    BorderStyle = sbsSunken
-    Caption = 'lblDedicatedLimit'
-    TabOrder = 11
-  end
-  object lblSharedUsage: TStaticText
-    Left = 8
-    Top = 222
-    Width = 169
-    Height = 17
-    AutoSize = False
-    BorderStyle = sbsSunken
-    Caption = 'lblSharedUsage'
-    TabOrder = 12
-  end
-  object lblDedicatedUsage: TStaticText
-    Left = 8
-    Top = 245
-    Width = 169
-    Height = 17
-    AutoSize = False
-    BorderStyle = sbsSunken
-    Caption = 'lblDedicatedUsage'
-    TabOrder = 13
+    object Label5: TLabel
+      Left = 12
+      Top = 24
+      Width = 75
+      Height = 13
+      Caption = 'Memory Usage:'
+    end
+    object Label6: TLabel
+      Left = 12
+      Top = 45
+      Width = 62
+      Height = 13
+      Caption = 'Shared Limit:'
+    end
+    object Label7: TLabel
+      Left = 12
+      Top = 68
+      Width = 76
+      Height = 13
+      Caption = 'Dedicated Limit:'
+    end
+    object Label8: TLabel
+      Left = 12
+      Top = 91
+      Width = 71
+      Height = 13
+      Caption = 'Shared Usage:'
+    end
+    object Label9: TLabel
+      Left = 12
+      Top = 114
+      Width = 85
+      Height = 13
+      Caption = 'Dedicated Usage:'
+    end
+    object lblMemoryUsage: TStaticText
+      Left = 104
+      Top = 24
+      Width = 158
+      Height = 17
+      AutoSize = False
+      BorderStyle = sbsSunken
+      Caption = '-'
+      TabOrder = 0
+    end
+    object lblSharedLimit: TStaticText
+      Left = 104
+      Top = 45
+      Width = 158
+      Height = 17
+      AutoSize = False
+      BorderStyle = sbsSunken
+      Caption = '-'
+      TabOrder = 1
+    end
+    object lblDedicatedLimit: TStaticText
+      Left = 104
+      Top = 68
+      Width = 158
+      Height = 17
+      AutoSize = False
+      BorderStyle = sbsSunken
+      Caption = '-'
+      TabOrder = 2
+    end
+    object lblSharedUsage: TStaticText
+      Left = 103
+      Top = 91
+      Width = 159
+      Height = 17
+      AutoSize = False
+      BorderStyle = sbsSunken
+      Caption = '-'
+      TabOrder = 3
+    end
+    object lblDedicatedUsage: TStaticText
+      Left = 103
+      Top = 114
+      Width = 159
+      Height = 17
+      AutoSize = False
+      BorderStyle = sbsSunken
+      Caption = '-'
+      TabOrder = 4
+    end
   end
   object tmrUpdate: TTimer
     Enabled = False

@@ -80,6 +80,8 @@ end;
 procedure TD3DKMTStatistics.Initialize;
 var
   QueryStats: D3DKMT_QUERYSTATISTICS;
+  QueryAdapterInfo: D3DKMT_QUERYADAPTERINFO;
+  SegmentInfo: D3DKMT_SEGMENTSIZEINFO;
 begin
   FInitialized:=True;
 
@@ -96,6 +98,20 @@ begin
     begin
       FSegments:=QueryStats.QueryResult.AdapterInformation.NbSegments;
       FNodeCount:=QueryStats.QueryResult.AdapterInformation.NodeCount;
+
+      ZeroMemory(@QueryAdapterInfo, SizeOf(QueryAdapterInfo));
+      ZeroMemory(@SegmentInfo, SizeOf(SegmentInfo));
+
+      QueryAdapterInfo.hAdapter:=FOpenAdapter.hAdapter;
+      QueryAdapterInfo.aType:=KMTQAITYPE_GETSEGMENTSIZE;
+      QueryAdapterInfo.pPrivateDriverData:=@SegmentInfo;
+      QueryAdapterInfo.PrivateDriverDataSize:=SizeOf(SegmentInfo);
+
+      if Succeeded(D3DKMTQueryAdapterInfo(QueryAdapterInfo)) then
+      begin
+        FDedicatedLimit:=SegmentInfo.DedicatedVideoMemorySize;
+        FSharedLimit:=SegmentInfo.SharedSystemMemorySize;
+      end;
     end else
       Finalize;
   end else
@@ -109,8 +125,6 @@ var
   CommitLimit, BytesCommitted: UInt64;
 begin
   FMemoryUsage:=0;
-  FSharedLimit:=0;
-  FDedicatedLimit:=0;
   FSharedUsage:=0;
   FDedicatedUsage:=0;
 
@@ -127,19 +141,11 @@ begin
       begin
         Inc(FMemoryUsage, QueryStats.QueryResult.SegmentInformation.BytesResident);
 
-        CommitLimit:=QueryStats.QueryResult.SegmentInformation.CommitLimit;
-        BytesCommitted:=QueryStats.QueryResult.SegmentInformation.BytesCommitted;
         BytesCommitted:=QueryStats.QueryResult.SegmentInformation.BytesResident;
-
         if QueryStats.QueryResult.SegmentInformation.Aperture <> 0 then
-        begin
-          Inc(FSharedLimit, CommitLimit);
-          Inc(FSharedUsage, BytesCommitted);
-        end else
-        begin
-          Inc(FDedicatedLimit, CommitLimit);
+          Inc(FSharedUsage, BytesCommitted)
+        else
           Inc(FDedicatedUsage, BytesCommitted);
-        end;
       end;
     end;
   end;

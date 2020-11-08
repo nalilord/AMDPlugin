@@ -24,11 +24,17 @@ type
     TrackBar1: TTrackBar;
     Label4: TLabel;
     edVRAM: TEdit;
+    GroupBox1: TGroupBox;
     lblMemoryUsage: TStaticText;
     lblSharedLimit: TStaticText;
     lblDedicatedLimit: TStaticText;
     lblSharedUsage: TStaticText;
     lblDedicatedUsage: TStaticText;
+    Label5: TLabel;
+    Label6: TLabel;
+    Label7: TLabel;
+    Label8: TLabel;
+    Label9: TLabel;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure tmrUpdateTimer(Sender: TObject);
