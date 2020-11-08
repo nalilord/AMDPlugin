@@ -16,6 +16,10 @@ Rainmeter AMD GPU Plugin
 * MemoryType
 * MemorySize
 * MemoryUsage
+* SharedLimit
+* SharedUsage
+* DedicatedLimit
+* DedicatedUsage
 * MemoryBandwidth
 * AdapterName
 * FanSpeedPercentMin
@@ -26,6 +30,8 @@ Rainmeter AMD GPU Plugin
 * BiosVersion
 * BiosPartNumber
 * NumberOfAdapters
+* DriverDate
+* DriverVersion
 
 ## Usage Example
 ```
