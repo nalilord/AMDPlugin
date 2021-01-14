@@ -254,7 +254,7 @@ end;
 
 function GetPluginVersion: Cardinal; stdcall;
 begin
-  Result:=3;
+  Result:=5;
 end;
 
 function GetPluginAuthor: PWideChar; stdcall;

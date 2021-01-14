@@ -4,8 +4,8 @@ object frmMain: TfrmMain
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSingle
   Caption = 'AMD GPU Info'
-  ClientHeight = 215
-  ClientWidth = 456
+  ClientHeight = 217
+  ClientWidth = 457
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -20,7 +20,7 @@ object frmMain: TfrmMain
   TextHeight = 13
   object lblTemp: TLabel
     Left = 8
-    Top = 8
+    Top = 40
     Width = 30
     Height = 21
     AutoSize = False
@@ -29,7 +29,7 @@ object frmMain: TfrmMain
   end
   object lblFan: TLabel
     Left = 8
-    Top = 32
+    Top = 64
     Width = 30
     Height = 21
     AutoSize = False
@@ -38,7 +38,7 @@ object frmMain: TfrmMain
   end
   object Label1: TLabel
     Left = 8
-    Top = 104
+    Top = 136
     Width = 30
     Height = 21
     AutoSize = False
@@ -47,7 +47,7 @@ object frmMain: TfrmMain
   end
   object Label2: TLabel
     Left = 8
-    Top = 56
+    Top = 88
     Width = 30
     Height = 21
     AutoSize = False
@@ -56,7 +56,7 @@ object frmMain: TfrmMain
   end
   object Label3: TLabel
     Left = 8
-    Top = 80
+    Top = 112
     Width = 41
     Height = 21
     AutoSize = False
@@ -65,99 +65,84 @@ object frmMain: TfrmMain
   end
   object Label4: TLabel
     Left = 8
-    Top = 128
+    Top = 160
     Width = 30
     Height = 21
     AutoSize = False
     Caption = 'VRAM:'
     Layout = tlCenter
   end
-  object btnGetInfo: TButton
-    Left = 8
-    Top = 155
-    Width = 80
-    Height = 25
-    Caption = 'Start'
-    TabOrder = 0
-    OnClick = btnGetInfoClick
-  end
   object edTemp: TEdit
     Left = 56
-    Top = 8
+    Top = 40
+    Width = 121
+    Height = 21
+    TabOrder = 0
+    Text = 'n/a'
+  end
+  object edFan: TEdit
+    Left = 56
+    Top = 64
     Width = 121
     Height = 21
     TabOrder = 1
     Text = 'n/a'
   end
-  object edFan: TEdit
+  object edLoad: TEdit
     Left = 56
-    Top = 32
+    Top = 136
     Width = 121
     Height = 21
     TabOrder = 2
     Text = 'n/a'
   end
-  object edLoad: TEdit
+  object edClock: TEdit
     Left = 56
-    Top = 104
+    Top = 88
     Width = 121
     Height = 21
     TabOrder = 3
     Text = 'n/a'
   end
-  object Button1: TButton
-    Left = 94
-    Top = 155
-    Width = 80
-    Height = 25
-    Caption = 'Stop'
-    TabOrder = 4
-    OnClick = Button1Click
-  end
-  object edClock: TEdit
-    Left = 56
-    Top = 56
-    Width = 121
-    Height = 21
-    TabOrder = 5
-    Text = 'n/a'
-  end
   object edMemory: TEdit
     Left = 56
-    Top = 80
+    Top = 112
     Width = 121
     Height = 21
-    TabOrder = 6
+    TabOrder = 4
     Text = 'n/a'
   end
   object TrackBar1: TTrackBar
     Left = 0
-    Top = 184
-    Width = 456
+    Top = 186
+    Width = 457
     Height = 31
     Align = alBottom
     Max = 1000
     Min = 250
     Position = 1000
-    TabOrder = 7
+    TabOrder = 5
     TickMarks = tmBoth
     TickStyle = tsNone
+    OnChange = TrackBar1Change
+    ExplicitTop = 184
+    ExplicitWidth = 456
   end
   object edVRAM: TEdit
     Left = 56
-    Top = 128
+    Top = 160
     Width = 121
     Height = 21
-    TabOrder = 8
+    TabOrder = 6
     Text = 'n/a'
   end
   object GroupBox1: TGroupBox
     Left = 183
-    Top = 8
+    Top = 40
     Width = 265
     Height = 141
     Caption = ' TD3DKMT Memory Info '
-    TabOrder = 9
+    TabOrder = 7
     object Label5: TLabel
       Left = 12
       Top = 24
@@ -244,10 +229,18 @@ object frmMain: TfrmMain
       TabOrder = 4
     end
   end
+  object cbAdapter: TComboBox
+    Left = 8
+    Top = 8
+    Width = 440
+    Height = 21
+    Style = csDropDownList
+    TabOrder = 8
+    OnChange = cbAdapterChange
+  end
   object tmrUpdate: TTimer
-    Enabled = False
     OnTimer = tmrUpdateTimer
     Left = 32
-    Top = 24
+    Top = 56
   end
 end

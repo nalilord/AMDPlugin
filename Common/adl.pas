@@ -106,8 +106,15 @@ type
     FOverdrive5_FanSpeedInfo: ADL_OVERDRIVE5_FANSPEEDINFO_GET;
     FOverdrive5_CurrentActivity: ADL_OVERDRIVE5_CURRENTACTIVITY_GET;
     FOverdrive5_ODParameters: ADL_OVERDRIVE5_ODPARAMETERS_GET;
+    FMain_Control_Create2: ADL2_MAIN_CONTROL_CREATE;
+    FMain_Control_Destroy2: ADL2_MAIN_CONTROL_DESTROY;
+    FOverdriveN_Temperature: ADL2_OVERDRIVEN_TEMPERATURE_GET;
+    FOverdrive8_Init_Setting: ADL2_OVERDRIVE8_INIT_SETTINGX2_GET;
+    FOverdrive8_Current_Setting: ADL2_OVERDRIVE8_CURRENT_SETTINGX2_GET;
+    FNew_QueryPMLogData: ADL2_NEW_QUERYPMLOGDATA_GET;
     FAdapterInfo: PAdapterInfo;
     FNumberAdapters: Integer;
+    FADL2Context: Pointer;
     function GetAdapterCount: Integer;
     function GetAdapters(Index: Integer): TADLAdapter;
   protected
@@ -119,7 +126,7 @@ type
     destructor Destroy; override;
     procedure Update;
     property AdapterCount: Integer read GetAdapterCount;
-    property Adapters[Index: Integer]: TADLAdapter read GetAdapters;
+    property Adapters[Index: Integer]: TADLAdapter read GetAdapters; default;
   end;
 
 implementation
@@ -130,6 +137,8 @@ uses
 const
   AMDVENDORID         = 1002;
   ADL_WARNING_NO_DATA = -100;
+
+{ Global }
 
 function ADL_Main_Memory_Alloc(iSize: Integer): Pointer; stdcall;
 begin
@@ -190,6 +199,14 @@ begin
     FOverdrive5_FanSpeedInfo:=GetProcAddress(FDLLHandle, 'ADL_Overdrive5_FanSpeedInfo_Get');
     FOverdrive5_CurrentActivity:=GetProcAddress(FDLLHandle, 'ADL_Overdrive5_CurrentActivity_Get');
     FOverdrive5_ODParameters:=GetProcAddress(FDLLHandle, 'ADL_Overdrive5_ODParameters_Get');
+
+    FMain_Control_Create2:=GetProcAddress(FDLLHandle, 'ADL2_Main_Control_Create');
+    FMain_Control_Destroy2:=GetProcAddress(FDLLHandle, 'ADL2_Main_Control_Destroy');
+    FOverdriveN_Temperature:=GetProcAddress(FDLLHandle, 'ADL2_OverdriveN_Temperature_Get');
+    FOverdrive8_Init_Setting:=GetProcAddress(FDLLHandle, 'ADL2_Overdrive8_Init_SettingX2_Get');
+    FOverdrive8_Current_Setting:=GetProcAddress(FDLLHandle, 'ADL2_Overdrive8_Current_SettingX2_Get');
+    FNew_QueryPMLogData:=GetProcAddress(FDLLHandle, 'ADL2_New_QueryPMLogData_Get');
+
     if (@FMain_Control_Create <> nil) AND
        (@FMain_Control_Destroy <> nil) AND
        (@FAdapter_NumberOfAdapters <> nil) AND
@@ -203,10 +220,19 @@ begin
        (@FOverdrive5_FanSpeed <> nil) AND
        (@FOverdrive5_FanSpeedInfo <> nil) AND
        (@FOverdrive5_CurrentActivity <> nil) AND
-       (@FOverdrive5_ODParameters <> nil) then
+       (@FOverdrive5_ODParameters <> nil) AND
+       (@FMain_Control_Create2 <> nil) AND
+       (@FMain_Control_Destroy2 <> nil) AND
+       (@FOverdriveN_Temperature <> nil) AND
+       (@FOverdrive8_Init_Setting <> nil) AND
+       (@FOverdrive8_Current_Setting <> nil) AND
+       (@FNew_QueryPMLogData <> nil) then
     begin
       if FMain_Control_Create(ADL_Main_Memory_Alloc, 1) <> ADL_OK then
         raise Exception.Create('ADL Initialization Error!');
+
+      if FMain_Control_Create2(ADL_Main_Memory_Alloc, 1, FADL2Context) <> ADL_OK then
+        raise Exception.Create('ADL2 Initialization Error!');
 
       FNumberAdapters:=0;
       if FAdapter_NumberOfAdapters(FNumberAdapters) <> ADL_OK then
@@ -231,7 +257,9 @@ procedure TADL.Update;
 var
   Registry: TRegistry;
   Adapter: TADLAdapter;
-  I, AdapterActive, IsSupported, IsEnabled, Version: Integer;
+  S: ADLSensorType;
+  D: ADLOD8SettingId;
+  I, J, AdapterActive, IsSupported, IsEnabled, Version, Capabilities, FeatureCount: Integer;
   BiosInfo: TADLBiosInfo;
   MemoryInfo: TADLMemoryInfo;
   AdapterInfo: TAdapterInfo;
@@ -241,6 +269,10 @@ var
   AdapterActivity: TADLPMActivity;
   ODParameters: TADLODParameters;
   ThermalControllerInfo: TADLThermalControllerInfo;
+  LogData: TADLPMLogDataOutput;
+  SettingsInit: TADLOD8InitSetting;
+  SettingsCurr: TADLOD8CurrentSetting;
+  SettingList: PADLOD8SingleInitSetting;
 begin
   if FInitialized then
   begin
@@ -262,91 +294,173 @@ begin
           Adapter:=GetAdapaterByLocation(AdapterInfo.iBusNumber, AdapterInfo.iDeviceNumber, AdapterInfo.iFunctionNumber);
           if NOT Assigned(Adapter) then
           begin
-            FAdapter_VideoBiosInfo(AdapterInfo.iAdapterIndex, BiosInfo);
-            FAdapter_MemoryInfo(AdapterInfo.iAdapterIndex, MemoryInfo);
-
-            Adapter:=TADLAdapter.Create;
-            try
-              Adapter.FUpdate:=True;
-
-              Adapter.FBiosPartNumber:=String(AnsiString(BiosInfo.strPartNumber));
-              Adapter.FBiosVersion:=String(AnsiString(BiosInfo.strVersion));
-              Adapter.FBiosDate:=String(AnsiString(BiosInfo.strDate));
-              Adapter.FMemorySize:=MemoryInfo.iMemorySize;
-              Adapter.FMemoryType:=String(AnsiString(MemoryInfo.strMemoryType));
-              Adapter.FMemoryBandwidth:=MemoryInfo.iMemoryBandwidth;
-              Adapter.FIndex:=AdapterInfo.iAdapterIndex;
-              Adapter.FName:=String(AnsiString(AdapterInfo.strAdapterName));
-              Adapter.FPNP:=String(AnsiString(AdapterInfo.strPNPString));
-              Adapter.FDisplay:=String(AnsiString(AdapterInfo.strDisplayName));
-              Adapter.FBusNumber:=AdapterInfo.iBusNumber;
-              Adapter.FDeviceNumber:=AdapterInfo.iDeviceNumber;
-              Adapter.FFunctionNumber:=AdapterInfo.iFunctionNumber;
-
-              Registry:=TRegistry.Create(KEY_READ);
+            if (FAdapter_VideoBiosInfo(AdapterInfo.iAdapterIndex, BiosInfo) = ADL_OK) AND (FAdapter_MemoryInfo(AdapterInfo.iAdapterIndex, MemoryInfo) = ADL_OK) then
+            begin
+              Adapter:=TADLAdapter.Create;
               try
-                Registry.RootKey:=HKEY_LOCAL_MACHINE;
-                if Registry.OpenKey(StringReplace(String(AnsiString(PAnsiChar(@AdapterInfo.strDriverPath[0]))), '\Registry\Machine\', '', [rfIgnoreCase]), False) then
+                Adapter.FUpdate:=True;
+
+                Adapter.FBiosPartNumber:=String(AnsiString(BiosInfo.strPartNumber));
+                Adapter.FBiosVersion:=String(AnsiString(BiosInfo.strVersion));
+                Adapter.FBiosDate:=String(AnsiString(BiosInfo.strDate));
+                Adapter.FMemorySize:=MemoryInfo.iMemorySize;
+                Adapter.FMemoryType:=String(AnsiString(MemoryInfo.strMemoryType));
+                Adapter.FMemoryBandwidth:=MemoryInfo.iMemoryBandwidth;
+                Adapter.FIndex:=AdapterInfo.iAdapterIndex;
+                Adapter.FName:=String(AnsiString(AdapterInfo.strAdapterName));
+                Adapter.FPNP:=String(AnsiString(AdapterInfo.strPNPString));
+                Adapter.FDisplay:=String(AnsiString(AdapterInfo.strDisplayName));
+                Adapter.FBusNumber:=AdapterInfo.iBusNumber;
+                Adapter.FDeviceNumber:=AdapterInfo.iDeviceNumber;
+                Adapter.FFunctionNumber:=AdapterInfo.iFunctionNumber;
+
+                if Version >= 8 then // If this is OD8 we need to get the sensor MAX values here...
+                begin
+                  SettingList:=nil;
+                  FeatureCount:=Integer(ADLOD8SettingId.OD8_COUNT);
+                  if FOverdrive8_Init_Setting(FADL2Context, AdapterInfo.iAdapterIndex, Capabilities, FeatureCount, SettingList) = ADL_OK then
+                  begin
+                    SettingsInit.count:=IfThen(FeatureCount > Integer(ADLOD8SettingId.OD8_COUNT), Integer(ADLOD8SettingId.OD8_COUNT), FeatureCount);
+                    SettingsInit.overdrive8Capabilities:=Capabilities;
+
+                    CopyMemory(@SettingsInit.od8SettingTable[OD8_GFXCLK_FMAX], SettingList, Min(FeatureCount * SizeOf(TADLOD8SingleInitSetting), SizeOf(SettingsInit.od8SettingTable)));
+
+                    Adapter.FClockMax:=SettingsInit.od8SettingTable[OD8_GFXCLK_FMAX].maxValue;
+                    Adapter.FMemoryMax:=SettingsInit.od8SettingTable[OD8_UCLK_FMAX].maxValue;
+                    Adapter.FFanMaxRPM:=SettingsInit.od8SettingTable[OD8_FAN_MIN_SPEED].maxValue;
+                  end;
+                end;
+
+                Registry:=TRegistry.Create(KEY_READ);
                 try
-                  Adapter.FDriverDate:=Registry.ReadString('DriverDate');
-                  Adapter.FDriverVersion:=Registry.ReadString('DriverVersion');
+                  Registry.RootKey:=HKEY_LOCAL_MACHINE;
+                  if Registry.OpenKey(StringReplace(String(AnsiString(PAnsiChar(@AdapterInfo.strDriverPath[0]))), '\Registry\Machine\', '', [rfIgnoreCase]), False) then
+                  try
+                    Adapter.FDriverDate:=Registry.ReadString('DriverDate');
+                    Adapter.FDriverVersion:=Registry.ReadString('DriverVersion');
+                  finally
+                    Registry.CloseKey;
+                  end;
                 finally
-                  Registry.CloseKey;
+                  FreeAndNil(Registry);
                 end;
               finally
-                FreeAndNil(Registry);
+                FAdapters.Add(Adapter);
               end;
-            finally
-              FAdapters.Add(Adapter);
             end;
           end;
 
           if Assigned(Adapter) AND Adapter.FUpdate then
           begin
-            ThermalControllerInfo.iSize:=SizeOf(ThermalControllerInfo);
-            FOverdrive5_ThermalDevices(AdapterInfo.iAdapterIndex, 0, ThermalControllerInfo);
-
-            AdapterTemp.iSize:=SizeOf(AdapterTemp);
-            FOverdrive5_Temperature(AdapterInfo.iAdapterIndex, 0, AdapterTemp);
-            Adapter.FTemp:=AdapterTemp.iTemperature div 1000;
-
-            AdapterFanSpeedInfo.iSize:=SizeOf(AdapterFanSpeedInfo);
-            FOverdrive5_FanSpeedInfo(AdapterInfo.iAdapterIndex, 0, AdapterFanSpeedInfo);
-
-            if (AdapterFanSpeedInfo.iFlags AND ADL_DL_FANCTRL_SUPPORTS_PERCENT_READ) = ADL_DL_FANCTRL_SUPPORTS_PERCENT_READ then
+            if Version >= 8 then
             begin
-              AdapterFanSpeed.iSize:=SizeOf(AdapterFanSpeed);
-              AdapterFanSpeed.iSpeedType:=ADL_DL_FANCTRL_SPEED_TYPE_PERCENT;
-              FOverdrive5_FanSpeed(AdapterInfo.iAdapterIndex, 0, AdapterFanSpeed);
-              Adapter.FFan:=AdapterFanSpeed.iFanSpeed;
-            end;
-
-            if (AdapterFanSpeedInfo.iFlags AND ADL_DL_FANCTRL_SUPPORTS_RPM_READ) = ADL_DL_FANCTRL_SUPPORTS_RPM_READ then
+              ZeroMemory(@LogData, SizeOf(LogData));
+              if FNew_QueryPMLogData(FADL2Context, AdapterInfo.iAdapterIndex, LogData) = ADL_OK then
+              begin
+                for S:=Low(ADLSensorType) to High(ADLSensorType) do
+                  with LogData.sensors[Integer(S)] do
+                    if supported <> 0 then
+                      case S of
+                        SENSOR_MAXTYPES: ;
+                        PMLOG_CLK_GFXCLK: Adapter.FClock:=value;
+                        PMLOG_CLK_MEMCLK: Adapter.FMemory:=value;
+                        PMLOG_CLK_SOCCLK: ;
+                        PMLOG_CLK_UVDCLK1: ;
+                        PMLOG_CLK_UVDCLK2: ;
+                        PMLOG_CLK_VCECLK: ;
+                        PMLOG_CLK_VCNCLK: ;
+                        PMLOG_TEMPERATURE_EDGE: ;
+                        PMLOG_TEMPERATURE_MEM: ;
+                        PMLOG_TEMPERATURE_VRVDDC: ;
+                        PMLOG_TEMPERATURE_VRMVDD: ;
+                        PMLOG_TEMPERATURE_LIQUID: ;
+                        PMLOG_TEMPERATURE_PLX: ;
+                        PMLOG_FAN_RPM: Adapter.FFanRPM:=value;
+                        PMLOG_FAN_PERCENTAGE: Adapter.FFan:=value;
+                        PMLOG_SOC_VOLTAGE: ;
+                        PMLOG_SOC_POWER: ;
+                        PMLOG_SOC_CURRENT: ;
+                        PMLOG_INFO_ACTIVITY_GFX: Adapter.FActivity:=value;
+                        PMLOG_INFO_ACTIVITY_MEM: ;
+                        PMLOG_GFX_VOLTAGE: Adapter.FVddc:=value / 1000;
+                        PMLOG_MEM_VOLTAGE: ;
+                        PMLOG_ASIC_POWER: ;
+                        PMLOG_TEMPERATURE_VRSOC: ;
+                        PMLOG_TEMPERATURE_VRMVDD0: ;
+                        PMLOG_TEMPERATURE_VRMVDD1: ;
+                        PMLOG_TEMPERATURE_HOTSPOT: Adapter.FTemp:=value;
+                        PMLOG_TEMPERATURE_GFX: ;
+                        PMLOG_TEMPERATURE_SOC: ;
+                        PMLOG_GFX_POWER: ;
+                        PMLOG_GFX_CURRENT: ;
+                        PMLOG_TEMPERATURE_CPU: ;
+                        PMLOG_CPU_POWER: ;
+                        PMLOG_CLK_CPUCLK: ;
+                        PMLOG_THROTTLER_STATUS: ;
+                        PMLOG_CLK_VCN1CLK1: ;
+                        PMLOG_CLK_VCN1CLK2: ;
+                        PMLOG_SMART_POWERSHIFT_CPU: ;
+                        PMLOG_SMART_POWERSHIFT_DGPU: ;
+                        PMLOG_MAX_SENSORS_REAL: ;
+                      end;
+              end;
+            end else
             begin
-              AdapterFanSpeed.iSize:=SizeOf(AdapterFanSpeed);
-              AdapterFanSpeed.iSpeedType:=ADL_DL_FANCTRL_SPEED_TYPE_RPM;
-              FOverdrive5_FanSpeed(AdapterInfo.iAdapterIndex, 0, AdapterFanSpeed);
-              Adapter.FFanRPM:=AdapterFanSpeed.iFanSpeed;
-              if Adapter.FFan > 0 then // Try to calc the max RPM here
-                Adapter.FFanMaxRPM:=Round(Adapter.FFanRPM / Adapter.FFan * 100);
+              ThermalControllerInfo.iSize:=SizeOf(ThermalControllerInfo);
+              if FOverdrive5_ThermalDevices(AdapterInfo.iAdapterIndex, 0, ThermalControllerInfo) = ADL_OK then
+              begin
+
+              end;
+
+              AdapterTemp.iSize:=SizeOf(AdapterTemp);
+              if FOverdrive5_Temperature(AdapterInfo.iAdapterIndex, 0, AdapterTemp) = ADL_OK then
+              begin
+                Adapter.FTemp:=AdapterTemp.iTemperature div 1000;
+              end;
+
+              AdapterFanSpeedInfo.iSize:=SizeOf(AdapterFanSpeedInfo);
+              if FOverdrive5_FanSpeedInfo(AdapterInfo.iAdapterIndex, 0, AdapterFanSpeedInfo) = ADL_OK then
+              begin
+                if (AdapterFanSpeedInfo.iFlags AND ADL_DL_FANCTRL_SUPPORTS_PERCENT_READ) = ADL_DL_FANCTRL_SUPPORTS_PERCENT_READ then
+                begin
+                  AdapterFanSpeed.iSize:=SizeOf(AdapterFanSpeed);
+                  AdapterFanSpeed.iSpeedType:=ADL_DL_FANCTRL_SPEED_TYPE_PERCENT;
+                  FOverdrive5_FanSpeed(AdapterInfo.iAdapterIndex, 0, AdapterFanSpeed);
+                  Adapter.FFan:=AdapterFanSpeed.iFanSpeed;
+                end;
+
+                if (AdapterFanSpeedInfo.iFlags AND ADL_DL_FANCTRL_SUPPORTS_RPM_READ) = ADL_DL_FANCTRL_SUPPORTS_RPM_READ then
+                begin
+                  AdapterFanSpeed.iSize:=SizeOf(AdapterFanSpeed);
+                  AdapterFanSpeed.iSpeedType:=ADL_DL_FANCTRL_SPEED_TYPE_RPM;
+                  FOverdrive5_FanSpeed(AdapterInfo.iAdapterIndex, 0, AdapterFanSpeed);
+                  Adapter.FFanRPM:=AdapterFanSpeed.iFanSpeed;
+                  if Adapter.FFan > 0 then // Try to calc the max RPM here
+                    Adapter.FFanMaxRPM:=Round(Adapter.FFanRPM / Adapter.FFan * 100);
+                end;
+              end;
+
+              AdapterActivity.iSize:=SizeOf(AdapterActivity);
+              if FOverdrive5_CurrentActivity(AdapterInfo.iAdapterIndex, AdapterActivity) = ADL_OK then
+              begin
+                Adapter.FActivity:=AdapterActivity.iActivityPercent;
+                Adapter.FVddc:=AdapterActivity.iVddc / 1000;
+                Adapter.FClock:=AdapterActivity.iEngineClock div 100;
+                Adapter.FMemory:=AdapterActivity.iMemoryClock div 100;
+                Adapter.FPerformanceLevel:=AdapterActivity.iCurrentPerformanceLevel;
+                Adapter.FBusSpeed:=AdapterActivity.iCurrentBusSpeed div 1000;
+                Adapter.FBusLanes:=AdapterActivity.iCurrentBusLanes;
+                Adapter.FBusLanesMax:=AdapterActivity.iMaximumBusLanes;
+              end;
+
+              ODParameters.iSize:=SizeOf(ODParameters);
+              if FOverdrive5_ODParameters(AdapterInfo.iAdapterIndex, ODParameters) = ADL_OK then
+              begin
+                Adapter.FVddcMax:=ODParameters.sVddc.iMax / 1000;
+                Adapter.FClockMax:=ODParameters.sEngineClock.iMax div 100;
+                Adapter.FMemoryMax:=ODParameters.sMemoryClock.iMax div 100;
+              end;
             end;
-
-            AdapterActivity.iSize:=SizeOf(AdapterActivity);
-            FOverdrive5_CurrentActivity(AdapterInfo.iAdapterIndex, AdapterActivity);
-            Adapter.FActivity:=AdapterActivity.iActivityPercent;
-            Adapter.FVddc:=AdapterActivity.iVddc / 1000;
-            Adapter.FClock:=AdapterActivity.iEngineClock div 100;
-            Adapter.FMemory:=AdapterActivity.iMemoryClock div 100;
-            Adapter.FPerformanceLevel:=AdapterActivity.iCurrentPerformanceLevel;
-            Adapter.FBusSpeed:=AdapterActivity.iCurrentBusSpeed div 1000;
-            Adapter.FBusLanes:=AdapterActivity.iCurrentBusLanes;
-            Adapter.FBusLanesMax:=AdapterActivity.iMaximumBusLanes;
-
-            ODParameters.iSize:=SizeOf(ODParameters);
-            FOverdrive5_ODParameters(AdapterInfo.iAdapterIndex, ODParameters);
-            Adapter.FVddcMax:=ODParameters.sVddc.iMax / 1000;
-            Adapter.FClockMax:=ODParameters.sEngineClock.iMax div 100;
-            Adapter.FMemoryMax:=ODParameters.sMemoryClock.iMax div 100;
 
             Adapter.FUpdate:=False;
           end;
@@ -362,6 +476,7 @@ begin
   begin
     FreeMem(FAdapterInfo);
     FMain_Control_Destroy;
+    FMain_Control_Destroy2(FADL2Context);
   end;
 
   FInitialized:=False;
@@ -385,6 +500,12 @@ begin
   @FOverdrive5_FanSpeedInfo:=nil;
   @FOverdrive5_CurrentActivity:=nil;
   @FOverdrive5_ODParameters:=nil;
+  @FMain_Control_Create2:=nil;
+  @FMain_Control_Destroy2:=nil;
+  @FOverdriveN_Temperature:=nil;
+  @FOverdrive8_Init_Setting:=nil;
+  @FOverdrive8_Current_Setting:=nil;
+  @FNew_QueryPMLogData:=nil;
 end;
 
 function TADL.GetAdapaterByLocation(ABusNumber, ADeviceNumber, AFunctionNumber: Integer): TADLAdapter;

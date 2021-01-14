@@ -131,9 +131,9 @@
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win64)'!=''">
         <Manifest_File>(None)</Manifest_File>
-        <VerInfo_Keys>FileDescription=$(MSBuildProjectName) $(Platform) $(Config);FileVersion=1.0.4.1;InternalName=$(MSBuildProjectName);LegalCopyright=(c) 2020 by NaliLord;OriginalFilename=AMDPlugin.dll;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=Rainmeter AMD GPU Plugin;ProductVersion=1.0.0.0</VerInfo_Keys>
-        <VerInfo_Release>4</VerInfo_Release>
-        <VerInfo_Build>1</VerInfo_Build>
+        <VerInfo_Keys>FileDescription=$(MSBuildProjectName) $(Platform) $(Config);FileVersion=1.0.5.2;InternalName=$(MSBuildProjectName);LegalCopyright=(c) 2021 by NaliLord;OriginalFilename=AMDPlugin.dll;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=Rainmeter AMD GPU Plugin;ProductVersion=1.0.0.0</VerInfo_Keys>
+        <VerInfo_Release>5</VerInfo_Release>
+        <VerInfo_Build>2</VerInfo_Build>
     </PropertyGroup>
     <ItemGroup>
         <DelphiCompile Include="$(MainSource)">
