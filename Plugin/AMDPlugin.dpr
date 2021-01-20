@@ -2,8 +2,13 @@
 {                                                       }
 {       AMDPlugin - Rainmeter AMD GPU Plugin            }
 {                                                       }
-{       Version 0.3                                     }
+{       Version 0.5                                     }
 {                                                       }
+{       2021-01-14 - 0.5                                }
+{         Added support the OD8 API and 6000 Series     }
+{       2020-11-08 - 0.4                                }
+{         Updated the reading of the D3DKMT Shared and  }
+{           Dedicated memory values                     }
 {       2020-10-07 - 0.3                                }
 {         Added "DriverDate" Measure                    }
 {         Added "DriverVersion" Measure                 }
@@ -16,7 +21,7 @@
 {       2020-10-03 - 0.1                                }
 {         Initial Release                               }
 {                                                       }
-{       (c) 2020 by NaliLord                            }
+{       (c) 2021 by NaliLord                            }
 {                                                       }
 {*******************************************************}
 

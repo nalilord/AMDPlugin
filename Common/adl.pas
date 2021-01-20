@@ -401,6 +401,12 @@ begin
                         PMLOG_CLK_VCN1CLK2: ;
                         PMLOG_SMART_POWERSHIFT_CPU: ;
                         PMLOG_SMART_POWERSHIFT_DGPU: ;
+                        PMLOG_BUS_SPEED: Adapter.FBusSpeed:=value;
+                        PMLOG_BUS_LANES:
+                        begin
+                          Adapter.FBusLanes:=value;
+                          Adapter.FBusLanesMax:=Max(Adapter.FBusLanes, value);
+                        end;
                         PMLOG_MAX_SENSORS_REAL: ;
                       end;
               end;
