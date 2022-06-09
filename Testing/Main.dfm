@@ -12,11 +12,9 @@ object frmMain: TfrmMain
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
-  OldCreateOrder = False
   Position = poScreenCenter
   OnCreate = FormCreate
   OnDestroy = FormDestroy
-  PixelsPerInch = 96
   TextHeight = 13
   object lblTemp: TLabel
     Left = 8
@@ -125,8 +123,6 @@ object frmMain: TfrmMain
     TickMarks = tmBoth
     TickStyle = tsNone
     OnChange = TrackBar1Change
-    ExplicitTop = 184
-    ExplicitWidth = 456
   end
   object edVRAM: TEdit
     Left = 56

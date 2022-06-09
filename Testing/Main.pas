@@ -70,7 +70,7 @@ begin
   FADL.Update;
 
   for I:=0 to FADL.AdapterCount - 1 do
-    cbAdapter.Items.Add(Format('[%d] %s', [I, FADL[I].Name]));
+    cbAdapter.Items.Add(Format('[%d] %s (V: %d)', [I, FADL[I].Name, FADL[I].APIVersion]));
 end;
 
 procedure TfrmMain.FormDestroy(Sender: TObject);

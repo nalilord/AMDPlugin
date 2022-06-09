@@ -122,7 +122,7 @@ procedure TD3DKMTStatistics.Update;
 var
   I: Integer;
   QueryStats: D3DKMT_QUERYSTATISTICS;
-  CommitLimit, BytesCommitted: UInt64;
+  BytesCommitted: UInt64;
 begin
   FMemoryUsage:=0;
   FSharedUsage:=0;

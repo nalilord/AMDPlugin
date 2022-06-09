@@ -2,14 +2,17 @@
 {                                                       }
 {       TADL Class for the AMD Display Library          }
 {                                                       }
-{       Version 0.2                                     }
+{       Version 0.3                                     }
 {                                                       }
+{       2022-10-05 - 0.3                                }
+{         Added APIVersion to TADLAdapter               }
+{         Added support for OD7(N) Drivers/Cards        }
 {       2020-10-05 - 0.2                                }
 {         Added PNP String to TADLAdapter               }
 {       2020-10-03 - 0.1                                }
 {         Initial Release                               }
 {                                                       }
-{       (c) 2020 by NaliLord                            }
+{       (c) 2022 by NaliLord                            }
 {                                                       }
 {*******************************************************}
 
@@ -37,7 +40,7 @@ type
     FBusNumber: Integer;
     FDeviceNumber: Integer;
     FFunctionNumber: Integer;
-    FTemp: Byte;
+    FTemp: Integer;
     FFan: Byte;
     FFanRPM: Integer;
     FFanMaxRPM: Integer;
@@ -54,8 +57,10 @@ type
     FBusLanesMax: Integer;
     FDriverDate: String;
     FDriverVersion: String;
+    FAPIVersion: Integer;
   public
     function IsLocation(ABusNumber, ADeviceNumber, AFunctionNumber: Integer): Boolean;
+    property APIVersion: Integer read FAPIVersion;
     property PNP: String read FPNP;
     property BiosPartNumber: String read FBiosPartNumber;
     property BiosVersion: String read FBiosVersion;
@@ -68,7 +73,7 @@ type
     property BusNumber: Integer read FBusNumber;
     property DeviceNumber: Integer read FDeviceNumber;
     property FunctionNumber: Integer read FFunctionNumber;
-    property Temp: Byte read FTemp;
+    property Temp: Integer read FTemp;
     property Fan: Byte read FFan;
     property FanRPM: Integer read FFanRPM;
     property FanMaxRPM: Integer read FFanMaxRPM;
@@ -91,7 +96,10 @@ type
   private
     FInitialized: Boolean;
     FDLLHandle: NativeUInt;
+    FNumberAdapters: Integer;
     FAdapters: TObjectList<TADLAdapter>;
+    // -- ADL --
+    FAdapterInfo: PAdapterInfo;
     FMain_Control_Create: ADL_MAIN_CONTROL_CREATE;
     FMain_Control_Destroy: ADL_MAIN_CONTROL_DESTROY;
     FAdapter_NumberOfAdapters: ADL_ADAPTER_NUMBEROFADAPTERS_GET;
@@ -100,21 +108,29 @@ type
     FAdapter_MemoryInfo: ADL_ADAPTER_MEMORYINFO_GET;
     FAdapter_Active: ADL_ADAPTER_ACTIVE_GET;
     FOverdrive_Caps: ADL_OVERDRIVE_CAPS;
+    // -- ADL2 --
+    FADL2Context: Pointer;
+    FMain_Control_Create2: ADL2_MAIN_CONTROL_CREATE;
+    FMain_Control_Destroy2: ADL2_MAIN_CONTROL_DESTROY;
+    FNew_QueryPMLogData: ADL2_NEW_QUERYPMLOGDATA_GET;
+    // -- OD5 --
     FOverdrive5_ThermalDevices: ADL_OVERDRIVE5_THERMALDEVICES_ENUM;
     FOverdrive5_Temperature: ADL_OVERDRIVE5_TEMPERATURE_GET;
     FOverdrive5_FanSpeed: ADL_OVERDRIVE5_FANSPEED_GET;
     FOverdrive5_FanSpeedInfo: ADL_OVERDRIVE5_FANSPEEDINFO_GET;
     FOverdrive5_CurrentActivity: ADL_OVERDRIVE5_CURRENTACTIVITY_GET;
     FOverdrive5_ODParameters: ADL_OVERDRIVE5_ODPARAMETERS_GET;
-    FMain_Control_Create2: ADL2_MAIN_CONTROL_CREATE;
-    FMain_Control_Destroy2: ADL2_MAIN_CONTROL_DESTROY;
-    FOverdriveN_Temperature: ADL2_OVERDRIVEN_TEMPERATURE_GET;
+    // -- OD6 --
+    FOverdrive6_Temperature: ADL_OVERDRIVE6_TEMPERATURE_GET;
+    // -- OD8 --
     FOverdrive8_Init_Setting: ADL2_OVERDRIVE8_INIT_SETTINGX2_GET;
     FOverdrive8_Current_Setting: ADL2_OVERDRIVE8_CURRENT_SETTINGX2_GET;
-    FNew_QueryPMLogData: ADL2_NEW_QUERYPMLOGDATA_GET;
-    FAdapterInfo: PAdapterInfo;
-    FNumberAdapters: Integer;
-    FADL2Context: Pointer;
+    // -- ODN --
+    FOverdriveN_Capabilities: ADL2_OVERDRIVEN_CAPABILITIES_GET;
+    FOverdriveN_Temperature: ADL2_OVERDRIVEN_TEMPERATURE_GET;
+    FOverdriveN_FanControlGet: ADL2_OVERDRIVEN_FANCONTROL_GET;
+    FOverdriveN_PerformanceStatus :ADL2_OVERDRIVEN_PERFORMANCESTATUS_GET;
+    // -- <<<
     function GetAdapterCount: Integer;
     function GetAdapters(Index: Integer): TADLAdapter;
   protected
@@ -200,9 +216,17 @@ begin
     FOverdrive5_CurrentActivity:=GetProcAddress(FDLLHandle, 'ADL_Overdrive5_CurrentActivity_Get');
     FOverdrive5_ODParameters:=GetProcAddress(FDLLHandle, 'ADL_Overdrive5_ODParameters_Get');
 
+    FOverdrive6_Temperature:=GetProcAddress(FDLLHandle, 'ADL_Overdrive6_Temperature_Get');
+
     FMain_Control_Create2:=GetProcAddress(FDLLHandle, 'ADL2_Main_Control_Create');
     FMain_Control_Destroy2:=GetProcAddress(FDLLHandle, 'ADL2_Main_Control_Destroy');
+
+    FOverdriveN_Capabilities:=GetProcAddress(FDLLHandle, 'ADL2_OverdriveN_Capabilities_Get');
     FOverdriveN_Temperature:=GetProcAddress(FDLLHandle, 'ADL2_OverdriveN_Temperature_Get');
+    FOverdriveN_FanControlGet:=GetProcAddress(FDLLHandle, 'ADL2_OverdriveN_FanControl_Get');
+    FOverdriveN_PerformanceStatus:=GetProcAddress(FDLLHandle, 'ADL2_OverdriveN_PerformanceStatus_Get');
+
+
     FOverdrive8_Init_Setting:=GetProcAddress(FDLLHandle, 'ADL2_Overdrive8_Init_SettingX2_Get');
     FOverdrive8_Current_Setting:=GetProcAddress(FDLLHandle, 'ADL2_Overdrive8_Current_SettingX2_Get');
     FNew_QueryPMLogData:=GetProcAddress(FDLLHandle, 'ADL2_New_QueryPMLogData_Get');
@@ -221,9 +245,13 @@ begin
        (@FOverdrive5_FanSpeedInfo <> nil) AND
        (@FOverdrive5_CurrentActivity <> nil) AND
        (@FOverdrive5_ODParameters <> nil) AND
+       (@FOverdrive6_Temperature <> nil) AND
        (@FMain_Control_Create2 <> nil) AND
        (@FMain_Control_Destroy2 <> nil) AND
+       (@FOverdriveN_Capabilities <> nil) AND
        (@FOverdriveN_Temperature <> nil) AND
+       (@FOverdriveN_FanControlGet <> nil) AND
+       (@FOverdriveN_PerformanceStatus <> nil) AND
        (@FOverdrive8_Init_Setting <> nil) AND
        (@FOverdrive8_Current_Setting <> nil) AND
        (@FNew_QueryPMLogData <> nil) then
@@ -258,8 +286,7 @@ var
   Registry: TRegistry;
   Adapter: TADLAdapter;
   S: ADLSensorType;
-  D: ADLOD8SettingId;
-  I, J, AdapterActive, IsSupported, IsEnabled, Version, Capabilities, FeatureCount: Integer;
+  I, AdapterActive, IsSupported, IsEnabled, Version, Caps, FeatureCount: Integer;
   BiosInfo: TADLBiosInfo;
   MemoryInfo: TADLMemoryInfo;
   AdapterInfo: TAdapterInfo;
@@ -268,11 +295,12 @@ var
   AdapterFanSpeedInfo: TADLFanSpeedInfo;
   AdapterActivity: TADLPMActivity;
   ODParameters: TADLODParameters;
-  ThermalControllerInfo: TADLThermalControllerInfo;
   LogData: TADLPMLogDataOutput;
   SettingsInit: TADLOD8InitSetting;
-  SettingsCurr: TADLOD8CurrentSetting;
   SettingList: PADLOD8SingleInitSetting;
+  FanControl: TADLODNFanControl;
+  PerformanceStats: TADLODNPerformanceStatus;
+  Capabilities: TADLODNCapabilities;
 begin
   if FInitialized then
   begin
@@ -318,16 +346,26 @@ begin
                 begin
                   SettingList:=nil;
                   FeatureCount:=Integer(ADLOD8SettingId.OD8_COUNT);
-                  if FOverdrive8_Init_Setting(FADL2Context, AdapterInfo.iAdapterIndex, Capabilities, FeatureCount, SettingList) = ADL_OK then
+                  if FOverdrive8_Init_Setting(FADL2Context, AdapterInfo.iAdapterIndex, Caps, FeatureCount, SettingList) = ADL_OK then
                   begin
                     SettingsInit.count:=IfThen(FeatureCount > Integer(ADLOD8SettingId.OD8_COUNT), Integer(ADLOD8SettingId.OD8_COUNT), FeatureCount);
-                    SettingsInit.overdrive8Capabilities:=Capabilities;
+                    SettingsInit.overdrive8Capabilities:=Caps;
 
                     CopyMemory(@SettingsInit.od8SettingTable[OD8_GFXCLK_FMAX], SettingList, Min(FeatureCount * SizeOf(TADLOD8SingleInitSetting), SizeOf(SettingsInit.od8SettingTable)));
 
                     Adapter.FClockMax:=SettingsInit.od8SettingTable[OD8_GFXCLK_FMAX].maxValue;
                     Adapter.FMemoryMax:=SettingsInit.od8SettingTable[OD8_UCLK_FMAX].maxValue;
                     Adapter.FFanMaxRPM:=SettingsInit.od8SettingTable[OD8_FAN_MIN_SPEED].maxValue;
+                  end;
+                end else
+                if Version = 7 then
+                begin
+                  if FOverdriveN_Capabilities(FADL2Context, AdapterInfo.iAdapterIndex, Capabilities) = ADL_OK then
+                  begin
+                    Adapter.FClockMax:=Capabilities.sEngineClockRange.iMax;
+                    Adapter.FMemoryMax:=Capabilities.sMemoryClockRange.iMax;
+                    Adapter.FVddcMax:=Capabilities.svddcRange.iMax;
+                    Adapter.FFanMaxRPM:=Capabilities.fanSpeed.iMax;
                   end;
                 end;
 
@@ -352,6 +390,8 @@ begin
 
           if Assigned(Adapter) AND Adapter.FUpdate then
           begin
+            Adapter.FAPIVersion:=Version;
+
             if Version >= 8 then
             begin
               ZeroMemory(@LogData, SizeOf(LogData));
@@ -411,13 +451,32 @@ begin
                       end;
               end;
             end else
+            if Version = 7 then
             begin
-              ThermalControllerInfo.iSize:=SizeOf(ThermalControllerInfo);
-              if FOverdrive5_ThermalDevices(AdapterInfo.iAdapterIndex, 0, ThermalControllerInfo) = ADL_OK then
+              if FOverdriveN_Temperature(FADL2Context, AdapterInfo.iAdapterIndex, Integer(CORE), Adapter.FTemp) = ADL_OK then
               begin
-
+                Adapter.FTemp:=Adapter.FTemp div 1000;
               end;
 
+              if FOverdriveN_FanControlGet(FADL2Context, AdapterInfo.iAdapterIndex, FanControl) = ADL_OK then
+              begin
+                Adapter.FFanRPM:=FanControl.iCurrentFanSpeed;
+                Adapter.FFan:=Round(100 / Adapter.FFanMaxRPM * Adapter.FFanRPM);
+              end;
+
+              if FOverdriveN_PerformanceStatus(FADL2Context, AdapterInfo.iAdapterIndex, PerformanceStats) = ADL_OK then
+              begin
+                Adapter.FActivity:=PerformanceStats.iGPUActivityPercent;
+                Adapter.FVddc:=PerformanceStats.iVddc / 1000;
+                Adapter.FClock:=PerformanceStats.iCoreClock div 100;
+                Adapter.FMemory:=PerformanceStats.iMemoryClock div 100;
+                Adapter.FPerformanceLevel:=PerformanceStats.iCurrentCorePerformanceLevel;
+                Adapter.FBusSpeed:=PerformanceStats.iCurrentBusSpeed div 1000;
+                Adapter.FBusLanes:=PerformanceStats.iCurrentBusLanes;
+                Adapter.FBusLanesMax:=PerformanceStats.iMaximumBusLanes;
+              end;
+            end else
+            begin
               AdapterTemp.iSize:=SizeOf(AdapterTemp);
               if FOverdrive5_Temperature(AdapterInfo.iAdapterIndex, 0, AdapterTemp) = ADL_OK then
               begin
@@ -506,9 +565,13 @@ begin
   @FOverdrive5_FanSpeedInfo:=nil;
   @FOverdrive5_CurrentActivity:=nil;
   @FOverdrive5_ODParameters:=nil;
+  @FOverdrive6_Temperature:=nil;
   @FMain_Control_Create2:=nil;
   @FMain_Control_Destroy2:=nil;
+  @FOverdriveN_Capabilities:=nil;
   @FOverdriveN_Temperature:=nil;
+  @FOverdriveN_FanControlGet:=nil;
+  @FOverdriveN_PerformanceStatus:=nil;
   @FOverdrive8_Init_Setting:=nil;
   @FOverdrive8_Current_Setting:=nil;
   @FNew_QueryPMLogData:=nil;

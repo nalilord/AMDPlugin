@@ -3,7 +3,7 @@ unit adl_sdk;
 interface
 
 uses
-  adl_structures;
+  adl_structures, adl_defines;
 
 ///
 ///  Copyright (c) 2008 - 2013 Advanced Micro Devices, Inc.
@@ -70,12 +70,13 @@ type
   ADL2_ADAPTER_ACTIVE_GET = function(hContext: Pointer; iNum: Integer; var iActive: Integer): Integer; stdcall;
 
   ADL2_OVERDRIVE_CAPS = function(hContext: Pointer; iAdapterIndex: Integer; var iSupported: Integer; var iEnabled: Integer; var iVersion: Integer): Integer; stdcall;
+  ADL2_OVERDRIVEN_CAPABILITIES_GET = function(hContext: Pointer; iAdapterIndex: Integer; var lpCapabilities: TADLODNCapabilities): Integer; stdcall;
   ADL2_OVERDRIVEN_CAPABILITIESX2_GET = function(hContext: Pointer; iAdapterIndex: Integer; var lpCapabilities: TADLODNCapabilitiesX2): Integer; stdcall;
-  ADL2_OVERDRIVEN_PERFORMANCESTATUS_GET = function(hContext: Pointer; iAdapterIndex: Integer; var lpStatus: ADLODNPerformanceStatus): Integer; stdcall;
-  ADL2_OVERDRIVEN_FANCONTROL_GET = function(hContext: Pointer; iAdapterIndex: Integer; var lpControl: ADLODNFanControl): Integer; stdcall;
-  ADL2_OVERDRIVEN_FANCONTROL_SET = function(hContext: Pointer; iAdapterIndex: Integer; var lpControl: ADLODNFanControl): Integer; stdcall;
-  ADL2_OVERDRIVEN_POWERLIMIT_GET = function(hContext: Pointer; iAdapterIndex: Integer; var lpLimit: ADLODNPowerLimitSetting): Integer; stdcall;
-  ADL2_OVERDRIVEN_POWERLIMIT_SET = function(hContext: Pointer; iAdapterIndex: Integer; var lpLimit: ADLODNPowerLimitSetting): Integer; stdcall;
+  ADL2_OVERDRIVEN_PERFORMANCESTATUS_GET = function(hContext: Pointer; iAdapterIndex: Integer; var lpStatus: TADLODNPerformanceStatus): Integer; stdcall;
+  ADL2_OVERDRIVEN_FANCONTROL_GET = function(hContext: Pointer; iAdapterIndex: Integer; var lpControl: TADLODNFanControl): Integer; stdcall;
+  ADL2_OVERDRIVEN_FANCONTROL_SET = function(hContext: Pointer; iAdapterIndex: Integer; var lpControl: TADLODNFanControl): Integer; stdcall;
+  ADL2_OVERDRIVEN_POWERLIMIT_GET = function(hContext: Pointer; iAdapterIndex: Integer; var lpLimit: TADLODNPowerLimitSetting): Integer; stdcall;
+  ADL2_OVERDRIVEN_POWERLIMIT_SET = function(hContext: Pointer; iAdapterIndex: Integer; var lpLimit: TADLODNPowerLimitSetting): Integer; stdcall;
   ADL2_OVERDRIVEN_TEMPERATURE_GET = function(hContext: Pointer; iAdapterIndex: Integer; iTemperatureType: Integer; var lpTemperature: Integer): Integer; stdcall;
   ADL2_OVERDRIVEN_SYSTEMCLOCKSX2_GET = function(hContext: Pointer; iAdapterIndex: Integer; var lpLevels: TADLODNPerformanceLevelsX2): Integer; stdcall;
   ADL2_OVERDRIVEN_SYSTEMCLOCKSX2_SET = function(hContext: Pointer; iAdapterIndex: Integer; var lpLevels: TADLODNPerformanceLevelsX2): Integer; stdcall;
