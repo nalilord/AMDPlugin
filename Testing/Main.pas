@@ -84,7 +84,7 @@ begin
 
   if cbAdapter.ItemIndex >= 0 then
   begin
-    edTemp.Text:=IntToStr(FADL.Adapters[cbAdapter.ItemIndex].Temp);
+    edTemp.Text:=IntToStr(FADL.Adapters[cbAdapter.ItemIndex].TempEdge) + '/' + IntToStr(FADL.Adapters[cbAdapter.ItemIndex].TempHotspot);
     edFan.Text:=IntToStr(FADL.Adapters[cbAdapter.ItemIndex].FanRPM);
     edLoad.Text:=IntToStr(FADL.Adapters[cbAdapter.ItemIndex].Activity);
     edClock.Text:=IntToStr(FADL.Adapters[cbAdapter.ItemIndex].Clock);

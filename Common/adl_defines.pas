@@ -27,6 +27,8 @@ interface
 /// \name General Definitions
 // @{
 
+{$MINENUMSIZE 4}
+
 const
 
   /// Defines ADL_TRUE
@@ -2113,6 +2115,8 @@ type
     ADL_PMLOG_BUS_SPEED = 40,
     ADL_PMLOG_BUS_LANES = 41
   );
+
+{$MINENUMSIZE 1}
 
 implementation
 

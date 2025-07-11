@@ -40,7 +40,8 @@ type
     FBusNumber: Integer;
     FDeviceNumber: Integer;
     FFunctionNumber: Integer;
-    FTemp: Integer;
+    FTempHotspot: Integer;
+    FTempEdge: Integer;
     FFan: Byte;
     FFanRPM: Integer;
     FFanMaxRPM: Integer;
@@ -73,7 +74,9 @@ type
     property BusNumber: Integer read FBusNumber;
     property DeviceNumber: Integer read FDeviceNumber;
     property FunctionNumber: Integer read FFunctionNumber;
-    property Temp: Integer read FTemp;
+    property Temp: Integer read FTempHotspot;
+    property TempHotspot: Integer read FTempHotspot;
+    property TempEdge: Integer read FTempEdge;
     property Fan: Byte read FFan;
     property FanRPM: Integer read FFanRPM;
     property FanMaxRPM: Integer read FFanMaxRPM;
@@ -409,7 +412,7 @@ begin
                         PMLOG_CLK_UVDCLK2: ;
                         PMLOG_CLK_VCECLK: ;
                         PMLOG_CLK_VCNCLK: ;
-                        PMLOG_TEMPERATURE_EDGE: ;
+                        PMLOG_TEMPERATURE_EDGE: Adapter.FTempEdge:=value;
                         PMLOG_TEMPERATURE_MEM: ;
                         PMLOG_TEMPERATURE_VRVDDC: ;
                         PMLOG_TEMPERATURE_VRMVDD: ;
@@ -428,7 +431,7 @@ begin
                         PMLOG_TEMPERATURE_VRSOC: ;
                         PMLOG_TEMPERATURE_VRMVDD0: ;
                         PMLOG_TEMPERATURE_VRMVDD1: ;
-                        PMLOG_TEMPERATURE_HOTSPOT: Adapter.FTemp:=value;
+                        PMLOG_TEMPERATURE_HOTSPOT: Adapter.FTempHotspot:=value;
                         PMLOG_TEMPERATURE_GFX: ;
                         PMLOG_TEMPERATURE_SOC: ;
                         PMLOG_GFX_POWER: ;
@@ -453,9 +456,9 @@ begin
             end else
             if Version = 7 then
             begin
-              if FOverdriveN_Temperature(FADL2Context, AdapterInfo.iAdapterIndex, Integer(CORE), Adapter.FTemp) = ADL_OK then
+              if FOverdriveN_Temperature(FADL2Context, AdapterInfo.iAdapterIndex, Integer(CORE), Adapter.FTempHotspot) = ADL_OK then
               begin
-                Adapter.FTemp:=Adapter.FTemp div 1000;
+                Adapter.FTempHotspot:=Adapter.FTempHotspot div 1000;
               end;
 
               if FOverdriveN_FanControlGet(FADL2Context, AdapterInfo.iAdapterIndex, FanControl) = ADL_OK then
@@ -480,7 +483,7 @@ begin
               AdapterTemp.iSize:=SizeOf(AdapterTemp);
               if FOverdrive5_Temperature(AdapterInfo.iAdapterIndex, 0, AdapterTemp) = ADL_OK then
               begin
-                Adapter.FTemp:=AdapterTemp.iTemperature div 1000;
+                Adapter.FTempHotspot:=AdapterTemp.iTemperature div 1000;
               end;
 
               AdapterFanSpeedInfo.iSize:=SizeOf(AdapterFanSpeedInfo);
@@ -605,7 +608,7 @@ end;
 
 function TADLAdapter.IsLocation(ABusNumber, ADeviceNumber, AFunctionNumber: Integer): Boolean;
 begin
-  Result:=(FBusNumber = ABusNumber) AND (FDeviceNumber = ADeviceNumber) AND (FDeviceNumber = AFunctionNumber);
+  Result:=(FBusNumber = ABusNumber) AND (FDeviceNumber = ADeviceNumber) AND (FFunctionNumber = AFunctionNumber);
 end;
 
 end.

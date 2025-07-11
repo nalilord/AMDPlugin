@@ -2,8 +2,10 @@
 {                                                       }
 {       AMDPlugin - Rainmeter AMD GPU Plugin            }
 {                                                       }
-{       Version 0.6                                     }
+{       Version 0.7                                     }
 {                                                       }
+{       2025-07-11 - 0.7                                }
+{         Added edge temperature reading                }
 {       2022-06-10 - 0.6                                }
 {         Added support the OD7(N) API                  }
 {       2021-01-14 - 0.5                                }
@@ -49,14 +51,14 @@ const
   MIN_UPDATE_TIME = 250;
 
 type
-  TMeasureID = (Unknown, APIVersion, Temperature, Clock, MemoryClock, Voltage, Activity, Usage, PerformanceLevel,
+  TMeasureID = (Unknown, APIVersion, Temperature, TemperatureEdge, Clock, MemoryClock, Voltage, Activity, Usage, PerformanceLevel,
     PCIECurrentBusSpeed, PCIECurrentBusLanes, PCIEMaxBusLanes, FanSpeedRPM, FanSpeedPercent, MemoryType,
     MemorySize, MemoryUsage, SharedLimit, DedicatedLimit, SharedUsage, DedicatedUsage, MemoryBandwidth, AdapterName,
     AdapterActive, FanSpeedPercentMin, FanSpeedPercentMax, FanSpeedRPMMin, FanSpeedRPMMax, BiosDate, BiosVersion,
     BiosPartNumber, AdapterIdentifier, NumberOfAdapters, NumberOfDisplays, DriverDate, DriverVersion);
 
 const
-  MEASUREID_NAMES: Array[TMeasureID] of String = ('Unknown', 'APIVersion', 'Temperature', 'Clock', 'MemoryClock', 'Voltage', 'Activity', 'Usage', 'PerformanceLevel',
+  MEASUREID_NAMES: Array[TMeasureID] of String = ('Unknown', 'APIVersion', 'Temperature', 'TemperatureEdge', 'Clock', 'MemoryClock', 'Voltage', 'Activity', 'Usage', 'PerformanceLevel',
     'PCIECurrentBusSpeed', 'PCIECurrentBusLanes', 'PCIEMaxBusLanes', 'FanSpeedRPM', 'FanSpeedPercent', 'MemoryType',
     'MemorySize', 'MemoryUsage', 'SharedLimit', 'DedicatedLimit', 'SharedUsage', 'DedicatedUsage', 'MemoryBandwidth', 'AdapterName',
     'AdapterActive', 'FanSpeedPercentMin', 'FanSpeedPercentMax', 'FanSpeedRPMMin', 'FanSpeedRPMMax', 'BiosDate', 'BiosVersion',
@@ -174,7 +176,8 @@ begin
     begin
       case Measure.ID of
         APIVersion          : Result:=ADL.Adapters[Measure.Adapter].APIVersion;
-        Temperature         : Result:=ADL.Adapters[Measure.Adapter].Temp;
+        Temperature         : Result:=ADL.Adapters[Measure.Adapter].TempHotspot;
+        TemperatureEdge     : Result:=ADL.Adapters[Measure.Adapter].TempEdge;
         Clock               : Result:=ADL.Adapters[Measure.Adapter].Clock;
         MemoryClock         : Result:=ADL.Adapters[Measure.Adapter].Memory;
         Voltage             : Result:=ADL.Adapters[Measure.Adapter].Vddc;
@@ -249,7 +252,7 @@ end;
 
 function GetPluginVersion: Cardinal; stdcall;
 begin
-  Result:=6;
+  Result:=7;
 end;
 
 function GetPluginAuthor: PWideChar; stdcall;
