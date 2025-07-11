@@ -3,6 +3,7 @@ Rainmeter AMD GPU Plugin
 
 ## Valid Measures
 * Temperature
+* TemperatureEdge
 * Clock
 * MemoryClock
 * Voltage
