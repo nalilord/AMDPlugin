@@ -5,7 +5,7 @@ object frmMain: TfrmMain
   BorderStyle = bsSingle
   Caption = 'AMD GPU Info'
   ClientHeight = 217
-  ClientWidth = 457
+  ClientWidth = 825
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -113,7 +113,7 @@ object frmMain: TfrmMain
   object TrackBar1: TTrackBar
     Left = 0
     Top = 186
-    Width = 457
+    Width = 825
     Height = 31
     Align = alBottom
     Max = 1000
@@ -123,6 +123,7 @@ object frmMain: TfrmMain
     TickMarks = tmBoth
     TickStyle = tsNone
     OnChange = TrackBar1Change
+    ExplicitWidth = 457
   end
   object edVRAM: TEdit
     Left = 56
@@ -233,6 +234,14 @@ object frmMain: TfrmMain
     Style = csDropDownList
     TabOrder = 8
     OnChange = cbAdapterChange
+  end
+  object lstNodes: TListBox
+    Left = 454
+    Top = 8
+    Width = 363
+    Height = 173
+    ItemHeight = 13
+    TabOrder = 9
   end
   object tmrUpdate: TTimer
     OnTimer = tmrUpdateTimer

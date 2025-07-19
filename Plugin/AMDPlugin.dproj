@@ -211,10 +211,10 @@
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win64)'!=''">
         <Manifest_File>(None)</Manifest_File>
-        <VerInfo_Keys>FileDescription=$(MSBuildProjectName) $(Platform) $(Config);FileVersion=1.0.7.2;InternalName=$(MSBuildProjectName);LegalCopyright=(c) 2025 by NaliLord;OriginalFilename=AMDPlugin.dll;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=Rainmeter AMD GPU Plugin;ProductVersion=1.0.0.0</VerInfo_Keys>
-        <VerInfo_Release>7</VerInfo_Release>
+        <VerInfo_Keys>FileDescription=$(MSBuildProjectName) $(Platform) $(Config);FileVersion=1.0.8.10;InternalName=$(MSBuildProjectName);LegalCopyright=(c) 2025 by NaliLord;OriginalFilename=AMDPlugin.dll;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=Rainmeter AMD GPU Plugin;ProductVersion=1.0.0.0</VerInfo_Keys>
+        <VerInfo_Release>8</VerInfo_Release>
         <AppDPIAwarenessMode>none</AppDPIAwarenessMode>
-        <VerInfo_Build>2</VerInfo_Build>
+        <VerInfo_Build>10</VerInfo_Build>
     </PropertyGroup>
     <ItemGroup>
         <DelphiCompile Include="$(MainSource)">

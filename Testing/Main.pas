@@ -34,6 +34,7 @@ type
     Label8: TLabel;
     Label9: TLabel;
     cbAdapter: TComboBox;
+    lstNodes: TListBox;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure tmrUpdateTimer(Sender: TObject);
@@ -79,6 +80,8 @@ begin
 end;
 
 procedure TfrmMain.tmrUpdateTimer(Sender: TObject);
+var
+  I: Integer;
 begin
   FADL.Update;
 
@@ -101,6 +104,12 @@ begin
     lblDedicatedLimit.Caption:=IntToStr(Round(FD3DKMT.DedicatedLimit / 1024 / 1024));
     lblSharedUsage.Caption:=IntToStr(Round(FD3DKMT.SharedUsage / 1024 / 1024));
     lblDedicatedUsage.Caption:=IntToStr(Round(FD3DKMT.DedicatedUsage / 1024 / 1024));
+
+    lstNodes.Clear;
+    for I in FD3DKMT.NodeEngines.Keys do
+    begin
+      lstNodes.Items.Add(Format('[%d] %n%% (%s)', [FD3DKMT.NodeEngines[I].Id, FD3DKMT.NodeEngines[I].UsagePercent, FD3DKMT.NodeEngines[I].Name]));
+    end;
   end;
 end;
 

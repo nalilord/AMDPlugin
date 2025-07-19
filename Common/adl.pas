@@ -101,6 +101,7 @@ type
     FDLLHandle: NativeUInt;
     FNumberAdapters: Integer;
     FAdapters: TObjectList<TADLAdapter>;
+    FData: Pointer;
     // -- ADL --
     FAdapterInfo: PAdapterInfo;
     FMain_Control_Create: ADL_MAIN_CONTROL_CREATE;
@@ -146,6 +147,7 @@ type
     procedure Update;
     property AdapterCount: Integer read GetAdapterCount;
     property Adapters[Index: Integer]: TADLAdapter read GetAdapters; default;
+    property Data: Pointer read FData write FData;
   end;
 
 implementation
