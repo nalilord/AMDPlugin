@@ -2993,6 +2993,49 @@ type
   TADLPMLogDataOutput = ADLPMLogDataOutput;
 
 type
+  ADLPMLogSupportInfo = record
+    usSensors: Array[0..ADL_PMLOG_MAX_SUPPORTED_SENSORS - 1] of Word;
+    ulReserved: Array[0..15] of Integer;
+  end;
+  PADLPMLogSupportInfo = ^ADLPMLogSupportInfo;
+  TADLPMLogSupportInfo = ADLPMLogSupportInfo;
+
+type
+  ADLPMLogStartInput = record
+    usSensors: Array[0..ADL_PMLOG_MAX_SUPPORTED_SENSORS - 1] of Word;
+    ulSampleRate: Cardinal;
+    ulReserved: Array[0..14] of Integer;
+  end;
+  PADLPMLogStartInput = ^ADLPMLogStartInput;
+  TADLPMLogStartInput = ADLPMLogStartInput;
+
+type
+  ADLPMLogData = record
+    ulVersion: Cardinal;
+    ulActiveSampleRate: Cardinal;
+    ulLastUpdated: UInt64;
+    ulValues: Array[0..ADL_PMLOG_MAX_SUPPORTED_SENSORS - 1, 0..1] of Cardinal;
+    ulReserved: Array[0..255] of Cardinal;
+  end;
+  PADLPMLogData = ^ADLPMLogData;
+  TADLPMLogData = ADLPMLogData;
+
+type
+  ADLPMLogStartOutput = record
+    pLoggingAddress: Pointer;
+    ulReserved: Array[0..13] of Integer;
+  end;
+  PADLPMLogStartOutput = ^ADLPMLogStartOutput;
+  TADLPMLogStartOutput = ADLPMLogStartOutput;
+
+type
+  ADLPMLogSensorLimits = record
+    SensorLimits: Array[0..ADL_PMLOG_MAX_SENSORS - 1, 0..1] of Integer;
+  end;
+  PADLPMLogSensorLimits = ^ADLPMLogSensorLimits;
+  TADLPMLogSensorLimits = ADLPMLogSensorLimits;
+
+type
   TADLODNTemperatureType = (
     CORE = 1,
     MEMORY = 2,

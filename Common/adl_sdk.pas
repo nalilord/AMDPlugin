@@ -96,6 +96,14 @@ type
   ADL2_OVERDRIVE8_SETTING_SET = function(hContext: Pointer; iAdapterIndex: Integer; var lpSetting: TADLOD8SetSetting; var lpSettingCurrent: TADLOD8CurrentSetting): Integer; stdcall;
   ADL2_NEW_QUERYPMLOGDATA_GET = function(hContext: Pointer; iAdapterIndex: Integer; var lpLog: TADLPMLogDataOutput): Integer; stdcall;
 
+  ADL2_OVERDRIVE8_PMLOGSENORTYPE_SUPPORT_GET = function(hContext: Pointer; iAdapterIndex: Integer; var lpNumOfSupportedSensorType: Integer; var lppSenroTypesList: PInteger): Integer; stdcall;
+  ADL2_OVERDRIVE8_PMLOG_SHAREMEMORY_SUPPORT = function(hContext: Pointer; iAdapterIndex: Integer; var lpSupported: Integer; iOption: Integer): Integer; stdcall;
+  ADL2_OVERDRIVE8_PMLOG_SHAREMEMORY_START = function(hContext: Pointer; iAdapterIndex: Integer; iSampleRate: Integer; iNumofPMLogSendorList: Integer; lpPMLogSendorList: PInteger; var lpHDevice: ADL_D3DKMT_HANDLE; var lppSharedMemory: Pointer; iOption: Integer): Integer; stdcall;
+  ADL2_OVERDRIVE8_PMLOG_SHAREMEMORY_READ = function(hContext: Pointer; iAdapterIndex: Integer; iNumSensor: Integer; lpSensorList: PInteger; var lppSharedMemory: Pointer; var lpDataOutput: TADLPMLogDataOutput): Integer; stdcall;
+  ADL2_OVERDRIVE8_PMLOG_SHAREMEMORY_STOP = function(hContext: Pointer; iAdapterIndex: Integer; var lpHDevice: ADL_D3DKMT_HANDLE): Integer; stdcall;
+  ADL2_DEVICE_PMLOG_DEVICE_CREATE = function(hContext: Pointer; iAdapterIndex: Integer; var pDevice: ADL_D3DKMT_HANDLE): Integer; stdcall;
+  ADL2_DEVICE_PMLOG_DEVICE_DESTROY = function(hContext: Pointer; hDevice: ADL_D3DKMT_HANDLE): Integer; stdcall;
+
   ADL2_OVERDRIVE8_INIT_SETTINGX2_GET = function(hContext: Pointer; iAdapterIndex: Integer; var lpOverdrive8Capabilities: Integer; var lpNumberOfFeatures: Integer; var lppInitSettingList: PADLOD8SingleInitSetting): Integer; stdcall;
   ADL2_OVERDRIVE8_CURRENT_SETTINGX2_GET = function(hContext: Pointer; iAdapterIndex: Integer; var lpNumberOfFeatures: Integer; var lppCurrentSettingList: PInteger): Integer; stdcall;
 

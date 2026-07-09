@@ -2,8 +2,14 @@
 {                                                       }
 {       AMDPlugin - Rainmeter AMD GPU Plugin            }
 {                                                       }
-{       Version 0.7                                     }
+{       Version 0.9                                     }
 {                                                       }
+{       2026-07-09 - 0.9                                }
+{         Added ADL2 shared-memory PMLog telemetry      }
+{         Added APU-friendly adapter enumeration        }
+{         Added PMLog backend diagnostics               }
+{       2025-07-19 - 0.8                                }
+{         Added D3DKMT node/engine measures             }
 {       2025-07-11 - 0.7                                }
 {         Added edge temperature reading                }
 {       2022-06-10 - 0.6                                }
@@ -25,7 +31,7 @@
 {       2020-10-03 - 0.1                                }
 {         Initial Release                               }
 {                                                       }
-{       (c) 2022 by NaliLord                            }
+{       (c) 2026 by NaliLord                            }
 {                                                       }
 {*******************************************************}
 
@@ -58,14 +64,16 @@ type
     PCIECurrentBusSpeed, PCIECurrentBusLanes, PCIEMaxBusLanes, FanSpeedRPM, FanSpeedPercent, MemoryType,
     MemorySize, MemoryUsage, SharedLimit, DedicatedLimit, SharedUsage, DedicatedUsage, MemoryBandwidth, AdapterName,
     AdapterActive, FanSpeedPercentMin, FanSpeedPercentMax, FanSpeedRPMMin, FanSpeedRPMMax, BiosDate, BiosVersion,
-    BiosPartNumber, AdapterIdentifier, NumberOfAdapters, NumberOfDisplays, DriverDate, DriverVersion);
+    BiosPartNumber, AdapterIdentifier, NumberOfAdapters, NumberOfDisplays, DriverDate, DriverVersion,
+    PMLogSupported, PMLogSharedMemorySupported, PMLogBackend);
 
 const
   MEASUREID_NAMES: Array[TMeasureID] of String = ('Unknown', 'APIVersion', 'Temperature', 'TemperatureEdge', 'Clock', 'MemoryClock', 'Voltage', 'Activity', 'Usage', 'PerformanceLevel',
     'PCIECurrentBusSpeed', 'PCIECurrentBusLanes', 'PCIEMaxBusLanes', 'FanSpeedRPM', 'FanSpeedPercent', 'MemoryType',
     'MemorySize', 'MemoryUsage', 'SharedLimit', 'DedicatedLimit', 'SharedUsage', 'DedicatedUsage', 'MemoryBandwidth', 'AdapterName',
     'AdapterActive', 'FanSpeedPercentMin', 'FanSpeedPercentMax', 'FanSpeedRPMMin', 'FanSpeedRPMMax', 'BiosDate', 'BiosVersion',
-    'BiosPartNumber', 'AdapterIdentifier', 'NumberOfAdapters', 'NumberOfDisplays', 'DriverDate', 'DriverVersion');
+    'BiosPartNumber', 'AdapterIdentifier', 'NumberOfAdapters', 'NumberOfDisplays', 'DriverDate', 'DriverVersion',
+    'PMLogSupported', 'PMLogSharedMemorySupported', 'PMLogBackend');
 
 type
   TMeasure = class
@@ -91,7 +99,7 @@ type
 
 var
   ADL: TADL = nil;
-  D3DKMT: TDictionary<String,TD3DKMTStatistics>;
+  D3DKMT: TObjectDictionary<String,TD3DKMTStatistics>;
   List: TObjectList<TMeasure> = nil;
   LastADLUpdate: UInt64 = 0;
   LastD3DKMTUpdate: UInt64 = 0;
@@ -144,7 +152,7 @@ begin
   if NOT Assigned(ADL) then
     ADL:=TADL.Create;
   if NOT Assigned(D3DKMT) then
-    D3DKMT:=TDictionary<String,TD3DKMTStatistics>.Create;
+    D3DKMT:=TObjectDictionary<String,TD3DKMTStatistics>.Create([doOwnsValues]);
   if NOT Assigned(List) then
     List:=TObjectList<TMeasure>.Create;
 
@@ -175,11 +183,8 @@ begin
             Measure.D3DKMTStatistics:=D3DKMT[ADL.Adapters[Measure.Adapter].PNP];
           end else
           begin
-            try
-              Measure.D3DKMTStatistics:=TD3DKMTStatistics.Create(ADL.Adapters[Measure.Adapter].PNP);
-            finally
-              D3DKMT.Add(ADL.Adapters[Measure.Adapter].PNP, Measure.D3DKMTStatistics);
-            end;
+            Measure.D3DKMTStatistics:=TD3DKMTStatistics.Create(ADL.Adapters[Measure.Adapter].PNP);
+            D3DKMT.Add(ADL.Adapters[Measure.Adapter].PNP, Measure.D3DKMTStatistics);
           end;
   finally
     List.Add(Measure);
@@ -236,6 +241,9 @@ begin
           FanSpeedRPMMin      : Result:=0;
           FanSpeedRPMMax      : Result:=ADL.Adapters[Measure.Adapter].FanMaxRPM;
           NumberOfAdapters    : Result:=ADL.AdapterCount;
+          PMLogSupported      : Result:=Integer(ADL.Adapters[Measure.Adapter].PMLogSupported);
+          PMLogSharedMemorySupported: Result:=Integer(ADL.Adapters[Measure.Adapter].PMLogSharedMemorySupported);
+          PMLogBackend        : Result:=Integer(ADL.Adapters[Measure.Adapter].PMLogBackend);
         end;
       end;
     end else
@@ -296,16 +304,18 @@ begin
   end;
 
   if Assigned(List) AND (List.Count = 0) then
+  begin
     FreeAndNil(List);
-  if Assigned(D3DKMT) then
-    FreeAndNil(D3DKMT);
+    if Assigned(D3DKMT) then
+      FreeAndNil(D3DKMT);
+  end;
   if Assigned(ADL) AND NOT Assigned(List) then
     FreeAndNil(ADL);
 end;
 
 function GetPluginVersion: Cardinal; stdcall;
 begin
-  Result:=8;
+  Result:=9;
 end;
 
 function GetPluginAuthor: PWideChar; stdcall;
